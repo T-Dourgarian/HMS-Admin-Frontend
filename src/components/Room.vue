@@ -43,56 +43,63 @@ card-footer-item: a repeatable list item
 		</div>
 
 
-		<div class="modal" :class="{'is-active': editDialog}" >
+		<div class="modal" :class="{'is-active': editDialog && roomToEdit}" >
 			<div class="modal-background">				
 			</div>
 			
 			<div class="modal-card">
 				<header class="modal-card-head">
-				<p class="modal-card-title">Modal title</p>
-				<button class="delete" aria-label="close"></button>
+					<p class="modal-card-title">Edit Room Details</p>
+					<button class="delete" aria-label="close" @click="cancelEdit()"></button>
 				</header>
 				<section class="modal-card-body">
 					<b-field label="Name">
-						<b-input v-model="name"></b-input>
+						<b-input v-model="roomToEdit.name"></b-input>
 					</b-field>
 
-					<b-field label="Email"
-						type="is-danger"
-						message="This email is invalid">
-						<b-input type="email"
-							value="john@"
-							maxlength="30">
-						</b-input>
+					<b-field label="Sub-title">
+						<b-input v-model="roomToEdit.subtitle"></b-input>
 					</b-field>
 
-					<b-field label="Username"
-						type="is-success"
-						message="This username is available">
-						<b-input value="johnsilver" maxlength="30"></b-input>
+					<b-field label="Description">
+						<b-input v-model="roomToEdit.description" maxlength="200" type="textarea" ></b-input>
 					</b-field>
 
-					<b-field label="Password">
-						<b-input type="password"
-							value="iwantmytreasure"
-							password-reveal>
-						</b-input>
+					<b-field label="Add Ons" >
+						<!-- <div v-for="addOn in addOns" :key="addOn.uuid">
+							<b-checkbox :value="roomToEdit.addOns.includes(addOn.name)">
+								{{ addOn.name}}
+								${{ addOn.cost}}
+							</b-checkbox>
+						</div> -->
+
+						<div v-for="addOn in addOns" :key="addOn.uuid">
+							<b-checkbox 
+								v-model="roomToEdit.addOns"
+								:native-value="addOn.name"
+							>
+								{{ addOn.name }} ${{ addOn.cost}}
+							</b-checkbox>
+						</div>
 					</b-field>
 
-					<b-field label="Message">
-						<b-input maxlength="200" type="textarea"></b-input>
-					</b-field>
+
 				</section>
+
 				<footer class="modal-card-foot">
 					<button 
 						class="button is-success"
-						@click="saveRoom()"
+						@click="saveEdit()"
 					>
 						Save changes
 					</button>
-					<button class="button">
+					<button 
+						class="button"
+						@click="cancelEdit()"
+					>
 						Cancel
 					</button>
+
 				</footer>
 			</div>
 		</div>
@@ -107,8 +114,11 @@ export default {
 	data() {
 		return {
 			rooms: null,
+			addons: null,
 			editDialog: false,
-			roomToEdit: null,
+			roomToEdit: {
+				addOns: []
+			},
 		}
 	},
 	methods: {
@@ -117,7 +127,8 @@ export default {
 			try {
 				const { data } = await axios.get('http://localhost:3000/api/room');
 
-				this.rooms = data;
+				this.rooms = data.rooms;
+				this.addOns = data.addOns;
 
 			} catch(error) {
 				console.log(error);
@@ -126,18 +137,21 @@ export default {
 		openEditDialog(room) {
 			this.roomToEdit = room;
 			this.editDialog = true;
-
-
-			console.log(room)
 		},
-		saveRoom() {
+		async saveEdit() {
 			try {
 
+				await axios.put(`http://localhost:3000/api/room/update/${this.roomToEdit.uuid}`, this.roomToEdit)
 
+				this.getRooms();				
+				
 				this.editDialog = false;
 			} catch(error) {
 				console.log(error);
 			}
+		},
+		cancelEdit() {
+			this.editDialog = false;
 		}
 	},
 	created() {

@@ -1,13 +1,16 @@
 <template>
 	<div>
-		<div class="is-primary" >Main</div>
+		<Navigation />
 		<router-view></router-view>
 	</div>
 </template>
 
 <script>
+import Navigation from './Navigation';
+
 export default {
   name: 'Main',
+  components: { Navigation },
   props: {
     msg: String
   }

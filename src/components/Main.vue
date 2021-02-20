@@ -1,6 +1,6 @@
 <template>
 	<div>
-		<div>Main</div>
+		<div class="is-primary" >Main</div>
 		<router-view></router-view>
 	</div>
 </template>

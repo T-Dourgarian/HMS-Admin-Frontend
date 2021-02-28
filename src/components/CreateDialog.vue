@@ -33,6 +33,16 @@
 					></b-input>
 				</b-field>
 
+				<b-field label="Base Price">
+					<b-input 
+						v-model="newRoom.basePrice"
+						placeholder="Price"
+						type="number"
+						icon-pack="fas"
+						icon="dollar-sign">
+					</b-input>
+				</b-field>
+
 
 
 				<!-- add ons -->
@@ -89,6 +99,7 @@ export default {
 				name: null,
 				subtitle: null,
 				description: null,
+				basePrice: null,
 				addOns: []
 			},
 			createLoading: false,

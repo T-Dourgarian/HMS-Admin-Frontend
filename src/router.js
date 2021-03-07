@@ -4,16 +4,21 @@ import VueRouter from 'vue-router';
 
 // import Main from './components/Main.vue'
 import Room from './components/Room.vue'
+import Calendar from './components/Calendar.vue';
 
 
 const routes = [
+	{ 
+		path: '/', 
+		redirect: '/dashboard' 
+	},
 	{ 
 		path: '/room', 
 		component: Room 
 	},
 	{ 
-		path: '/', 
-		redirect: '/dashboard' 
+		path: '/calendar', 
+		component: Calendar 
 	},
     // { 
 	// 	path: '/balances', 

@@ -12,8 +12,8 @@
             <b-navbar-item tag="router-link"  :to="{ path: '/room' }">
                 Rooms
             </b-navbar-item>
-            <b-navbar-item tag="router-link"  :to="{ path: '/listing' }">
-                Schedule
+            <b-navbar-item tag="router-link"  :to="{ path: '/calendar' }">
+                Calendar
             </b-navbar-item>
         </template>
 

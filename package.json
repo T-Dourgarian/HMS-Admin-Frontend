@@ -13,6 +13,8 @@
   "main": "index.js",
   "dependencies": {
     "core-js": "^3.6.5",
+    "dayspan-vuetify": "^0.4.0",
+    "moment": "^2.29.1",
     "vue": "^2.6.11",
     "vuex": "^3.6.2"
   },

@@ -37,7 +37,8 @@ export default {
 	computed: {
 		navbarStyle: () => {
 			return {
-				'border-bottom':'2px solid #7957d5'
+				'border-bottom':'2px solid #7957d5',
+				'height':'8vh'
 			}
 		}
 	}

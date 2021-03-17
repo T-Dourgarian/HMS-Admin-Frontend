@@ -109,9 +109,44 @@
 				<b-button
 					type="is-primary"
 					expanded
+					@click="bookingDialog = !bookingDialog"
+					:loading="createBookingLoading"
 				>
 					Create Booking
 				</b-button>
+
+
+				<div class="modal" :class="{'is-active': bookingDialog}">
+					<div class="modal-background">				
+					</div>
+					
+					<div class="modal-card">
+						<header class="modal-card-head">
+							<p class="modal-card-title"> Confirm Booking </p>
+							<button class="delete" aria-label="close" @click="cancelBooking()"></button>
+						</header>
+						<section class="modal-card-body">
+							
+							
+						</section>
+
+						<footer class="modal-card-foot">
+							<b-button 
+								type="is-success"
+								@click="createBooking()"
+							>
+								Confirm
+							</b-button>
+							<b-button
+								type="is-danger"
+								outlined
+								@click="cancelBooking"
+							>
+								Cancel
+							</b-button>
+						</footer>
+					</div>
+				</div>
 
 			
 			</b-tab-item>
@@ -119,9 +154,6 @@
 				searching bookings
 			</b-tab-item>
         </b-tabs>
-
-		
-	
 	</div>
 </template>
 
@@ -143,17 +175,23 @@ export default {
 			listings: [],
 			addOns:[],
 			isOpen: null,
+			createBookingLoading: false,
+			bookingDialog: false,
 			newBooking: {
 				customerDetails: {
 					customerName: null,
 					customerEmail: null,
 					customerNumber: null,
 				},
+				numberOfGuests: null,
 				numberOfNights: 0,
 				roomPrice: 0.00,
 				addOnPrice: 0.00,
 				totalPrice: 0.00,
-				roomUuid: null
+				roomUuid: null,
+				checkIn: null,
+				listingUuids: null,
+				allDates: []
 			}
 		}
 	},
@@ -161,6 +199,60 @@ export default {
 		this.getListings();
 	},
 	methods: {
+		async createBooking() {
+			try {
+				if (this.newBooking.roomUuid) {
+					this.createBookingLoading = true;
+
+					let lastNight = new Date(this.newBooking.allDates[this.newBooking.allDates.length - 1]);
+					let checkOut = new Date(this.newBooking.allDates[this.newBooking.allDates.length - 1])
+					
+					// await axios.post('http://localhost:3000/api/booking/create',
+					// 	{
+					// 		roomUuid: this.newBooking.roomUuid,
+					// 		lastNight: lastNight,
+					// 		checkIn: this.newBooking.checkIn,
+					// 		checkOut: checkOut.setDate(lastNight.getDate() + 1),
+					// 		numberOfNights: this.newBooking.allDates.length,
+					// 		listingsBooked: this.newBooking.listingUuids,
+					// 		roomPrice: this.newBooking.roomPrice,
+					// 		addOnPrice: this.newBooking.addOnPrice,
+					// 		totalPrice: this.newBooking.totalPrice,
+					// 		numberOfGuests: 1, // not set up yet,
+					// 		customerDetails: {
+					// 			...this.newBooking.customerDetails
+					// 		}
+					// 	}
+					// );
+
+					console.log({
+							roomUuid: this.newBooking.roomUuid,
+							lastNight: lastNight,
+							checkIn: this.newBooking.checkIn,
+							checkOut: checkOut.setDate(lastNight.getDate() + 1),
+							numberOfNights: this.newBooking.allDates.length,
+							listingsBooked: this.newBooking.listingUuids,
+							roomPrice: this.newBooking.roomPrice,
+							addOnPrice: this.newBooking.addOnPrice,
+							totalPrice: this.newBooking.totalPrice,
+							numberOfGuests: 1, // not set up yet,
+							customerDetails: {
+								...this.newBooking.customerDetails
+							}
+						})
+
+
+
+					this.createBookingLoading = false;
+				} else {
+					this.errorMsg = "You must fill the missing fields before booking";
+				}
+
+			} catch(error) {
+				this.createBookingLoading = false;
+				console.log(error);
+			}
+		},
 		async getListings() {
 			try {
 				const { data } = await axios.get('http://localhost:3000/api/listing', {
@@ -196,13 +288,17 @@ export default {
 				});
 
 				this.newBooking.roomUuid = listing.room[0].uuid;
-				this.newBooking.roomPrice = listing.totalPrice
-				this.newBooking.addOnPrice = addOnCosts
-				this.newBooking.totalPrice = listing.totalPrice + addOnCosts
-				this.newBooking.numberOfNights = listing.numberOfNights
-				this.newBooking.listingsBooked = listing.listingsBooked
+				this.newBooking.roomPrice = listing.totalPrice;
+				this.newBooking.addOnPrice = addOnCosts;
+				this.newBooking.totalPrice = listing.totalPrice + addOnCosts;
+				this.newBooking.numberOfNights = listing.numberOfNights;
+				this.newBooking.listingsBooked = listing.listingsBooked;
+				this.newBooking.allDates = listing.allDates;
+				this.newBooking.checkIn = listing.checkIn;
+				this.newBooking.listingUuids = listing.listingUuids;
+
 			}else {
-				backgroundColor= '#c8b9f0'
+				backgroundColor = '#c8b9f0';
 			}
 
 			return {
@@ -210,6 +306,9 @@ export default {
 				margin: '5px 0 0 0',
 				border: border
 			}
+		},
+		cancelBooking() {
+			this.bookingDialog = false;
 		}
 	},
 	watch: {

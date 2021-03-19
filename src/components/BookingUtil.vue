@@ -37,7 +37,7 @@
 								role="button"
 							>
 								<p class="card-header-title darkPurpleText" style="margin: 0">
-									{{ listing.room[0].name }} - ${{ listing.room[0].basePrice }} / Night
+									{{ listing.name }} - ${{ listing.basePrice }} / Night
 								</p>
 								<a class="card-header-icon">
 									<b-icon
@@ -49,7 +49,7 @@
 						</template>
 						<div class="card-content">
 							<div class="content">
-								<div v-for="addOn in listing.room[0].addOns" :key="addOn.uuid">
+								<div v-for="addOn in listing.addOns" :key="addOn.uuid">
 									<div>
 										<b-checkbox 
 											class="darkPurpleText"
@@ -126,6 +126,10 @@
 							<button class="delete" aria-label="close" @click="cancelBooking()"></button>
 						</header>
 						<section class="modal-card-body">
+
+							<div>Booking Details</div>
+
+							<div>Dates - {{ moment(checkInOut[0]).format('DD-MM-YYYY') }} to {{ moment(checkInOut[1]).format('DD-MM-YYYY') }}</div>
 							
 							
 						</section>
@@ -161,8 +165,6 @@
 
 
 <script>
-		// 	checkIn,
-		// 	checkOut,
 import axios from 'axios';
 import moment from 'moment';
 
@@ -189,7 +191,6 @@ export default {
 				addOnPrice: 0.00,
 				totalPrice: 0.00,
 				roomUuid: null,
-				checkIn: null,
 				listingUuids: null,
 				allDates: []
 			}
@@ -203,39 +204,34 @@ export default {
 			try {
 				if (this.newBooking.roomUuid) {
 					this.createBookingLoading = true;
-
-					let lastNight = new Date(this.newBooking.allDates[this.newBooking.allDates.length - 1]);
-					let checkOut = new Date(this.newBooking.allDates[this.newBooking.allDates.length - 1])
 					
 					// await axios.post('http://localhost:3000/api/booking/create',
-					// 	{
-					// 		roomUuid: this.newBooking.roomUuid,
-					// 		lastNight: lastNight,
-					// 		checkIn: this.newBooking.checkIn,
-					// 		checkOut: checkOut.setDate(lastNight.getDate() + 1),
-					// 		numberOfNights: this.newBooking.allDates.length,
-					// 		listingsBooked: this.newBooking.listingUuids,
-					// 		roomPrice: this.newBooking.roomPrice,
-					// 		addOnPrice: this.newBooking.addOnPrice,
-					// 		totalPrice: this.newBooking.totalPrice,
-					// 		numberOfGuests: 1, // not set up yet,
-					// 		customerDetails: {
-					// 			...this.newBooking.customerDetails
-					// 		}
-					// 	}
+						// {
+						// 	roomUuid: this.newBooking.roomUuid,
+						// 	checkIn: this.checkInOut[0],
+						// 	checkOut: this.checkInOut[1],
+						// 	numberOfNights: this.numberOfNights,
+						// 	roomPrice: this.newBooking.roomPrice * this.numberOfNights,
+						// 	addOnPrice: this.newBooking.addOnPrice,
+						// 	totalPrice: this.newBooking.totalPrice,
+						// 	numberOfGuests: this.newBooking.numberOfGuests,
+						// 	customerDetails: {
+						// 		...this.newBooking.customerDetails
+						// 	}
+						// }
 					// );
+
+					this.numberOfNights = this.numNights(this.checkInOut[0], this.checkInOut[1]);
 
 					console.log({
 							roomUuid: this.newBooking.roomUuid,
-							lastNight: lastNight,
-							checkIn: this.newBooking.checkIn,
-							checkOut: checkOut.setDate(lastNight.getDate() + 1),
-							numberOfNights: this.newBooking.allDates.length,
-							listingsBooked: this.newBooking.listingUuids,
-							roomPrice: this.newBooking.roomPrice,
+							checkIn: this.checkInOut[0],
+							checkOut: this.checkInOut[1],
+							numberOfNights: this.numberOfNights,
+							roomPrice: this.newBooking.roomPrice * this.numberOfNights,
 							addOnPrice: this.newBooking.addOnPrice,
 							totalPrice: this.newBooking.totalPrice,
-							numberOfGuests: 1, // not set up yet,
+							numberOfGuests: this.newBooking.numberOfGuests,
 							customerDetails: {
 								...this.newBooking.customerDetails
 							}
@@ -255,16 +251,16 @@ export default {
 		},
 		async getListings() {
 			try {
-				const { data } = await axios.get('http://localhost:3000/api/listing', {
+				const { data } = await axios.get('http://localhost:3000/api/room/listings', {
 					params: {
 						checkIn: this.checkInOut[0].toISOString().split('T')[0],
 						checkOut: this.checkInOut[1].toISOString().split('T')[0]
 					}
 				});
+				console.log(data)
 				this.listings = data;
 				this.listingToBook = data[0];
 
-				console.log(this.listings)
 
 
 			} catch(error) {
@@ -287,15 +283,11 @@ export default {
 					addOnCosts += addOn.cost
 				});
 
-				this.newBooking.roomUuid = listing.room[0].uuid;
-				this.newBooking.roomPrice = listing.totalPrice;
+				this.newBooking.roomUuid = listing.uuid;
+				this.newBooking.roomPrice = listing.basePrice;
 				this.newBooking.addOnPrice = addOnCosts;
-				this.newBooking.totalPrice = listing.totalPrice + addOnCosts;
+				this.newBooking.totalPrice = listing.basePrice + addOnCosts;
 				this.newBooking.numberOfNights = listing.numberOfNights;
-				this.newBooking.listingsBooked = listing.listingsBooked;
-				this.newBooking.allDates = listing.allDates;
-				this.newBooking.checkIn = listing.checkIn;
-				this.newBooking.listingUuids = listing.listingUuids;
 
 			}else {
 				backgroundColor = '#c8b9f0';
@@ -309,6 +301,17 @@ export default {
 		},
 		cancelBooking() {
 			this.bookingDialog = false;
+		},
+		numNights(day1, day2) {
+
+			const oneDay = 24 * 60 * 60 * 1000; // hours*minutes*seconds*milliseconds
+
+			const diffDays = Math.round(Math.abs((day1 - day2) / oneDay));
+
+			return diffDays;
+		},
+		moment(date) {
+			return moment(date);
 		}
 	},
 	watch: {

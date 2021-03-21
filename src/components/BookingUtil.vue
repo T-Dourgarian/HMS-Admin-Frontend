@@ -84,21 +84,21 @@
 
 				<div class="purpleText" style="margin: 10px 0 3px 0 !important;" >Name</div>
 				<b-input 
-					v-model="newBooking.customerDetails.customerName" 
+					v-model="newBooking.customerDetails.name" 
 					custom-class="darkPurpleText purpleBackground" 
 					placeholder="Name"
 				></b-input>
 
 				<div class="purpleText" style="margin: 10px 0 3px 0 !important;" >Email</div>
 				<b-input 
-					v-model="newBooking.customerDetails.customerEmail" 
+					v-model="newBooking.customerDetails.email" 
 					custom-class="darkPurpleText purpleBackground" 
 					placeholder="Email"
 				></b-input>
 
 				<div class="purpleText" style="margin: 10px 0 3px 0 !important;" >Phone Number</div>
 				<b-input 
-					v-model="newBooking.customerDetails.customerNumber" 
+					v-model="newBooking.customerDetails.phoneNumber" 
 					custom-class="darkPurpleText purpleBackground" 
 					placeholder="Phone Number"
 					type="number"
@@ -110,7 +110,6 @@
 					type="is-primary"
 					expanded
 					@click="bookingDialog = !bookingDialog"
-					:loading="createBookingLoading"
 				>
 					Create Booking
 				</b-button>
@@ -127,9 +126,33 @@
 						</header>
 						<section class="modal-card-body">
 
-							<div>Booking Details</div>
+							<div><b>Booking Details</b></div>
 
-							<div>Dates - {{ moment(checkInOut[0]).format('DD-MM-YYYY') }} to {{ moment(checkInOut[1]).format('DD-MM-YYYY') }}</div>
+
+							<div>Name: {{ newBooking.customerDetails.name }}</div>
+							<div>Email: {{ newBooking.customerDetails.email }}</div>
+							<div>Phone: {{ newBooking.customerDetails.phoneNumber }}</div>
+
+							<div>Dates - {{ moment(checkInOut[0]).format('DD-MM-YYYY') }} to {{ moment(checkInOut[1]).format('DD-MM-YYYY') }} | {{ newBooking.numberOfNights }} Nights</div>
+
+							<div>Room: {{ newBooking.roomName }}</div>
+							<div>Guests: {{ newBooking.numberOfGuests }}</div>
+
+							<br>
+
+							<div>
+								<b>Add-ons</b>
+								<div v-for="addOn in addOns" :key="addOn.uuid">
+									<div> {{ addOn.name }}  ${{ addOn.cost }}</div> 
+								</div>
+							</div>
+
+							<br>
+
+							<b>Pricing</b>
+							<div> Room: ${{ newBooking.roomPrice }} </div>
+							<div> Add-ons: ${{ newBooking.addOnPrice }} </div>
+							<div> Total: ${{ newBooking.totalPrice }} </div>
 							
 							
 						</section>
@@ -138,6 +161,7 @@
 							<b-button 
 								type="is-success"
 								@click="createBooking()"
+								:loading="createBookingLoading"
 							>
 								Confirm
 							</b-button>
@@ -181,10 +205,11 @@ export default {
 			bookingDialog: false,
 			newBooking: {
 				customerDetails: {
-					customerName: null,
-					customerEmail: null,
-					customerNumber: null,
+					name: null,
+					email: null,
+					phoneNumber: null,
 				},
+				roomName: null,
 				numberOfGuests: null,
 				numberOfNights: 0,
 				roomPrice: 0.00,
@@ -202,47 +227,33 @@ export default {
 	methods: {
 		async createBooking() {
 			try {
+				this.createBookingLoading = true;
 				if (this.newBooking.roomUuid) {
-					this.createBookingLoading = true;
 					
-					// await axios.post('http://localhost:3000/api/booking/create',
-						// {
-						// 	roomUuid: this.newBooking.roomUuid,
-						// 	checkIn: this.checkInOut[0],
-						// 	checkOut: this.checkInOut[1],
-						// 	numberOfNights: this.numberOfNights,
-						// 	roomPrice: this.newBooking.roomPrice * this.numberOfNights,
-						// 	addOnPrice: this.newBooking.addOnPrice,
-						// 	totalPrice: this.newBooking.totalPrice,
-						// 	numberOfGuests: this.newBooking.numberOfGuests,
-						// 	customerDetails: {
-						// 		...this.newBooking.customerDetails
-						// 	}
-						// }
-					// );
-
-					this.numberOfNights = this.numNights(this.checkInOut[0], this.checkInOut[1]);
-
-					console.log({
+					await axios.post('http://localhost:3000/api/booking/create',
+						{
 							roomUuid: this.newBooking.roomUuid,
+							addOns: this.addOns,
 							checkIn: this.checkInOut[0],
 							checkOut: this.checkInOut[1],
-							numberOfNights: this.numberOfNights,
-							roomPrice: this.newBooking.roomPrice * this.numberOfNights,
+							numberOfNights: this.newBooking.numberOfNights,
+							roomPrice: this.newBooking.roomPrice * this.newBooking.numberOfNights,
 							addOnPrice: this.newBooking.addOnPrice,
 							totalPrice: this.newBooking.totalPrice,
 							numberOfGuests: this.newBooking.numberOfGuests,
 							customerDetails: {
 								...this.newBooking.customerDetails
 							}
-						})
+						}
+					);
 
+					this.bookingDialog = false;
 
-
-					this.createBookingLoading = false;
+					this.$emit('refreshBookings');
 				} else {
 					this.errorMsg = "You must fill the missing fields before booking";
 				}
+				this.createBookingLoading = true;
 
 			} catch(error) {
 				this.createBookingLoading = false;
@@ -257,7 +268,7 @@ export default {
 						checkOut: this.checkInOut[1].toISOString().split('T')[0]
 					}
 				});
-				console.log(data)
+
 				this.listings = data;
 				this.listingToBook = data[0];
 
@@ -284,10 +295,12 @@ export default {
 				});
 
 				this.newBooking.roomUuid = listing.uuid;
+				this.newBooking.roomName = listing.name;
 				this.newBooking.roomPrice = listing.basePrice;
 				this.newBooking.addOnPrice = addOnCosts;
 				this.newBooking.totalPrice = listing.basePrice + addOnCosts;
-				this.newBooking.numberOfNights = listing.numberOfNights;
+
+				this.newBooking.numberOfNights = this.numNights(this.checkInOut[0], this.checkInOut[1]);
 
 			}else {
 				backgroundColor = '#c8b9f0';

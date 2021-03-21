@@ -1,7 +1,9 @@
 <template>
 	<v-row style="margin: 0 !important; height: 92vh; maxHeight: 92vh; ">
 		<v-col class='col-4 element' style="backgroundColor:#453f54; maxHeight: inherit !important; overflow-y:auto !important;">
-			<BookingUtil />
+			<BookingUtil 
+				@refreshBookings="getBookings()" 
+			/>
 		</v-col>
 		<v-col class='col-8'>
 			<v-row class="fill-height">
@@ -246,7 +248,7 @@ export default {
 						customerPhoneNumber: booking.customerDetails.phoneNumber  ? booking.customerDetails.phoneNumber : 'N/A',
 						customerEmail: booking.customerDetails.email ? booking.customerDetails.email : 'N/A',
 						roomName: booking.room[0].name,
-						addOns: booking.room[0].addOns,
+						addOns: booking.addOns,
 						numberOfGuests: booking.numberOfGuests,
 						numberOfNights: booking.numberOfNights
 					}
@@ -276,6 +278,7 @@ export default {
 			console.log(event)
 
         const open = () => {
+			console.log(event)
           this.selectedEvent = event
           this.selectedElement = nativeEvent.target
           setTimeout(() => {

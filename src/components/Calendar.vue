@@ -97,7 +97,6 @@
 						v-model="selectedOpen"
 						:close-on-content-click="false"
 						:activator="selectedElement"
-						offset-x
 						>
 						<v-card
 							color="grey lighten-4"
@@ -108,24 +107,30 @@
 							:color="selectedEvent.color"
 							dark
 							>
-							<v-btn icon>
-								<v-icon>mdi-pencil</v-icon>
-							</v-btn>
-							<v-toolbar-title v-if="selectedEvent.checkIn">
-								<v-row align="center" justify="center">
-									<v-col>
-										{{ selectedEvent.details }} - {{ selectedEvent.customerName }}
-									</v-col>
-									<v-col  style="fontSize: 13px;">
-										Check In:
-											<span style="margin: auto 0 auto 5px;">{{ selectedEvent.checkIn.getMonth() + 1 }}/{{ selectedEvent.checkIn.getDate()}}</span>
-									</v-col>
-									<v-col style="fontSize: 13px;">
-										Check Out:
-										<span style="margin: auto 0 auto 5px;">{{ selectedEvent.checkOut.getMonth() + 1 }}/{{ selectedEvent.checkOut.getDate() }}</span>
-									</v-col>
-								</v-row>
-							</v-toolbar-title>
+								<v-toolbar-title v-if="selectedEvent.checkIn">
+									<v-row align="center" justify="center">
+										<v-col>
+											{{ selectedEvent.details }} - {{ selectedEvent.customerName }}
+										</v-col>
+										<v-col  style="fontSize: 13px;">
+											Check In:
+												<span style="margin: auto 0 auto 5px;">{{ selectedEvent.checkIn.getMonth() + 1 }}/{{ selectedEvent.checkIn.getDate()}}</span>
+										</v-col>
+										<v-col style="fontSize: 13px;">
+											Check Out:
+											<span style="margin: auto 0 auto 5px;">{{ selectedEvent.checkOut.getMonth() + 1 }}/{{ selectedEvent.checkOut.getDate() }}</span>
+										</v-col>
+										<v-col>
+											<v-btn 
+												icon
+												@click="openDeleteDialog(selectedEvent)"
+											>
+												<v-icon>fas fa-trash-alt</v-icon>
+											</v-btn>	
+										</v-col>
+									</v-row>
+								</v-toolbar-title>
+
 							</v-toolbar>
 							<v-card-text>
 								<v-row>
@@ -183,9 +188,9 @@
 							<v-btn
 								text
 								color="secondary"
-								@click="selectedOpen = false"
+								@click="selectedOpen = false;"
 							>
-								Cancel
+								Close
 							</v-btn>
 							</v-card-actions>
 						</v-card>
@@ -194,6 +199,44 @@
 				</v-col>
 			</v-row>
 		</v-col>
+
+		<v-col>
+			<div class="modal" :class="{'is-active': deleteDialog}">
+					<div class="modal-background">				
+					</div>
+					
+					<div class="modal-card">
+						<header class="modal-card-head">
+							<p class="modal-card-title"> Cancel Booking </p>
+							<button class="delete" aria-label="close" @click="deleteDialog = false;"></button>
+						</header>
+
+						<section class="modal-card-body">
+							<div>
+								Are you sure you want to cancel the booking for <b>{{ bookingToDelete.customerName }}</b>?
+							</div>
+						</section>
+
+						<footer class="modal-card-foot">
+							<b-button 
+								type="is-success"
+								@click="deleteBooking()"
+								:loading="deleteBookingLoading"
+							>
+								Confirm
+							</b-button>
+							<b-button
+								type="is-danger"
+								outlined
+								@click="deleteDialog = false;"
+							>
+								Cancel
+							</b-button>
+						</footer>
+					</div>
+				</div>
+		</v-col>
+
 	</v-row>
 </template>
 
@@ -220,7 +263,9 @@ export default {
 		selectedElement: null,
 		selectedOpen: false,
 		events: [],
-		dialog: false,
+		bookingToDelete: {},
+		deleteDialog: false,
+		deleteBookingLoading: false,
 		colors: 'blue'
     }),
 	components : { BookingUtil },
@@ -232,11 +277,9 @@ export default {
 			try {
 				const { data } = await axios.get('http://localhost:3000/api/booking');
 
-				console.log(data.bookings)
-				
-
 				this.events = data.bookings.map(booking => {
 					return {
+						uuid: booking.uuid,
 						name: booking.customerDetails.name,
 						details: 'Booking',
 						start: booking.checkIn.substring(0,10),
@@ -252,11 +295,25 @@ export default {
 						numberOfGuests: booking.numberOfGuests,
 						numberOfNights: booking.numberOfNights
 					}
-				})
-
+				});
 			} catch(error) {
 				console.log(error)
 			}
+		},
+		async deleteBooking() {
+			try {
+				await axios.delete(`http://localhost:3000/api/booking/cancel/${this.bookingToDelete.uuid}`);
+
+				this.getBookings();
+
+				this.deleteDialog = false;
+			} catch(error) {
+				console.log(error)
+			}
+		},
+		openDeleteDialog(booking) {
+			this.bookingToDelete = booking;
+			this.deleteDialog = true; 
 		},
 		viewDay ({ date }) {
 			this.focus = date
@@ -275,10 +332,8 @@ export default {
 		this.$refs.calendar.next()
       },
       showEvent ({ nativeEvent, event }) {
-			console.log(event)
 
         const open = () => {
-			console.log(event)
           this.selectedEvent = event
           this.selectedElement = nativeEvent.target
           setTimeout(() => {

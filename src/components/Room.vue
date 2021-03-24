@@ -1,65 +1,68 @@
 <template>
-
-		<!-- card: the main container
-card-header: a horizontal bar with a shadow
-card-header-title: a left-aligned bold text
-card-header-icon: a placeholder for an icon
-card-image: a fullwidth container for a responsive image
-card-content: a multi-purpose container for any other element
-card-footer: a horizontal list of controls
-card-footer-item: a repeatable list item
-		-->
-	<div v-if="rooms">
-		Manage Rooms
-
-		<b-button
+	<div>
+		<!-- <b-button
 			outline
 			type="is-success"
 			@click="toggleCreateDialog()"
 		>
 			Create
-		</b-button>
+		</b-button> -->
 
-		<div v-for="room in rooms" :key="room.uuid">
-			<div class="card" style="margin: 0 20% 20px 20%; border: 3px solid grey">
-				<div class="card-content">
-					<div class="title" >
-						{{ room.name }}
+		<!-- <div v-for="room in rooms" :key="room.uuid"> -->
+			<!-- <div class="card" >
+				<div class="card-content ">
+	
+					<div >
+						<div class="title" >
+							{{ room.name }}
+						</div>
+
+						<div class="subtitle">
+							{{ room.subtitle }}
+						</div>
+
+						<div class="content">
+							{{ room.description }}
+						</div>
 					</div>
-
-					<div class="subtitle">
-						{{ room.subtitle }}
-					</div>
-
-					<div class="content">
-						{{ room.description }}
-					</div>
-
 				</div>
 
 				<footer class="card-footer">
-					<div class="card-footer-item">
-						<b-button type="is-primary" 
-							outlined
-							icon-pack="fas"
-							icon-left="pencil-alt"
-							label="Edit"
-							@click="openEditDialog(room)"
-							style="margin: 0 5px 0 0"
-						/>
-						<b-button type="is-primary is-danger" 
-							outlined
-							icon-pack="fas"
-							icon-left="trash-alt"
-							label="Delete"
-							@click="openDeleteDialog(room)"
-							style="margin: 0 5px 0 0"
-						/>
-					</div>
 				</footer>
-			</div>
-		</div>
+			</div> -->
+		<!-- </div> -->
 
+
+		
+		<v-row style="height: 92vh; maxHeight: 92vh; margin: 0 !important;">
+			<v-col cols="3" style="maxHeight: inherit" class="pa-0 darkPurpleText darkPurpleBackground">
+				<div v-for="room in rooms" :key="room.uuid">
+					<b-button
+						style="width:100%"
+						@click="selectRoom(room)"
+						:style="buttonStyle(room)"
+					>
+						{{ room.name }}
+					</b-button>
+				</div>
+			</v-col>
+			<v-col cols="9" >
+				<div class="title darkPurpleText">
+					{{ selectedRoom.name }}
+				</div>
+				<div class="subtitle is-6 darkPurpleText">
+					{{ selectedRoom.subtitle }}
+				</div>
+			<div>
+				<div class="title is-5" style='borderBottom: 1px solid #453f54; width:200px !important;'>
+					Description
+				</div>
+				<div class="subtitle is-6">
+					{{ selectedRoom.description }}
+				</div>
+			</div>
+			</v-col>
+		</v-row>
 
 		<div class="modal" :class="{'is-active': editDialog && roomToEdit}" >
 			<div class="modal-background">				
@@ -153,6 +156,7 @@ export default {
 			roomToEdit: {
 				addOns: []
 			},
+			selectedRoom: {}
 		}
 	},
 	components: { DeleteDialog, CreateDialog },
@@ -164,10 +168,33 @@ export default {
 
 				this.rooms = data.rooms;
 				this.addOns = data.addOns;
+				this.selectedRoom = data.rooms[0]
 
 			} catch(error) {
 				console.log(error);
 			}
+		},
+		selectRoom(room) {
+			this.selectedRoom = room;
+		},
+		buttonStyle(room) {
+
+			let buttonStyle = {
+				'color': '#c8b9f0',
+				'borderRadius':'0',
+				'outline': 'none',
+				border: 'none',
+				'box-shadow': 'none !important',
+				background: 'transparent',
+				'font-family': 'Roboto, sans-serif'
+			};
+
+			if (this.selectedRoom.uuid == room.uuid) {
+				buttonStyle.color = '#e0d9f3'
+			}
+
+
+			return buttonStyle;
 		},
 		openEditDialog(room) {
 			this.roomToEdit = room;
@@ -207,6 +234,32 @@ export default {
 }
 </script>
 
-<style>
+<style scoped>
+
+.darkPurpleBackground {
+	background: #453f54;
+}
+
+
+.darkPurpleText {
+	color: #453f54;
+}
+
+
+.purpleText {
+	color: #c8b9f0  !important;
+
+}
+
+.purpleBackground {
+	background: #c8b9f0;
+}
+
+input::-webkit-outer-spin-button,
+      input::-webkit-inner-spin-button {
+        display: none;
+      }
+
+
 
 </style>

@@ -1,11 +1,11 @@
 <template>
-	<v-row style="margin: 0 !important; height: 92vh; maxHeight: 92vh; ">
-		<v-col class='col-4 element' style="backgroundColor:#453f54; maxHeight: inherit !important; overflow-y:auto !important;">
+	<v-row style="margin: 0 !important; height: 92vh; maxHeight: 92vh;">
+		<v-col class='col-3 element' style="backgroundColor:#453f54; maxHeight: inherit !important; overflow-y:auto !important;">
 			<BookingUtil 
 				@refreshBookings="getBookings()" 
 			/>
 		</v-col>
-		<v-col class='col-8'>
+		<v-col class='col-9'>
 			<v-row class="fill-height">
 				<v-col>
 					<v-sheet height="64">
@@ -198,9 +198,8 @@
 					</v-sheet>
 				</v-col>
 			</v-row>
-		</v-col>
 
-		<v-col>
+			<!-- delete booking modal -->
 			<div class="modal" :class="{'is-active': deleteDialog}">
 					<div class="modal-background">				
 					</div>
@@ -236,7 +235,6 @@
 					</div>
 				</div>
 		</v-col>
-
 	</v-row>
 </template>
 

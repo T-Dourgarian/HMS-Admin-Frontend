@@ -38,7 +38,8 @@ export default {
 		navbarStyle: () => {
 			return {
 				'border-bottom':'2px solid #7957d5',
-				'height':'8vh'
+				'height':'8vh',
+				'backgroundColor': 'rgb(238, 238, 238)'
 			}
 		}
 	}
@@ -48,7 +49,7 @@ export default {
 <style>
 
 .style {
-	background: rgb(177, 176, 192);
+	background: rgb(238, 238, 238);
 }
 
 </style>

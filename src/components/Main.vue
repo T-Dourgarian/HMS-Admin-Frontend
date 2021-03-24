@@ -1,7 +1,11 @@
 <template>
 	<div style="height: 100vh">
-		<Navigation />
-		<router-view></router-view>
+		<div>
+			<Navigation />
+		</div>
+		<div style="background: rgb(238, 238, 238)">
+			<router-view></router-view>
+		</div>
 	</div>
 </template>
 

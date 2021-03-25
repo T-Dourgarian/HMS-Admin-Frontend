@@ -53,14 +53,53 @@
 				<div class="subtitle is-6 darkPurpleText">
 					{{ selectedRoom.subtitle }}
 				</div>
-			<div>
-				<div class="title is-5" style='borderBottom: 1px solid #453f54; width:200px !important;'>
-					Description
+				<div style="margin: 0 0 25px 0">
+					<div class="darkPurpleText" style='borderBottom: 1px solid #453f54; width:200px !important;'>
+						<b>Description</b>
+					</div>
+					<div class="subtitle is-6">
+						{{ selectedRoom.description }}
+					</div>
 				</div>
-				<div class="subtitle is-6">
-					{{ selectedRoom.description }}
+				<div style="margin: 0 0 25px 0">
+					<div class="darkPurpleText" style='borderBottom: 1px solid #453f54; width:200px !important;'>
+						<b>Add-ons</b>
+					</div>
+					<div 
+						v-for="addOn in selectedRoom.addOns" 
+						:key="addOn.uuid"
+					>
+						<div>{{ addOn.name }} - ${{ addOn.cost }}</div>
+					</div>
 				</div>
-			</div>
+
+				<div>
+					<v-row>
+						<v-col cols='1'>
+							<b-button
+								type="is-primary"
+								outlined
+								icon-left="fas fa-edit"
+								small
+								@click="openEditDialog(selectedRoom)"
+							>
+								Edit
+							</b-button>
+						</v-col>
+						<v-col cols='1'>
+							<b-button
+								type="is-primary"
+								outlined
+								icon-left="fas fa-trash"
+								small
+								@click="openDeleteDialog(selectedRoom)"
+							>
+								Delete
+							</b-button>
+						</v-col>
+					</v-row>
+					
+				</div>
 			</v-col>
 		</v-row>
 
@@ -169,6 +208,7 @@ export default {
 				this.rooms = data.rooms;
 				this.addOns = data.addOns;
 				this.selectedRoom = data.rooms[0]
+				console.log(this.selectedRoom)
 
 			} catch(error) {
 				console.log(error);

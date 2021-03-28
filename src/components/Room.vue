@@ -8,68 +8,81 @@
 			Create
 		</b-button> -->
 
-		<!-- <div v-for="room in rooms" :key="room.uuid"> -->
-			<!-- <div class="card" >
-				<div class="card-content ">
-	
-					<div >
-						<div class="title" >
-							{{ room.name }}
-						</div>
-
-						<div class="subtitle">
-							{{ room.subtitle }}
-						</div>
-
-						<div class="content">
-							{{ room.description }}
-						</div>
-					</div>
-				</div>
-
-				<footer class="card-footer">
-				</footer>
-			</div> -->
-		<!-- </div> -->
-
 
 		
 		<v-row style="height: 92vh; maxHeight: 92vh; margin: 0 !important;">
-			<v-col cols="3" style="maxHeight: inherit" class="pa-0 darkPurpleText darkPurpleBackground">
+			<v-col cols="3" style="maxHeight: inherit; position: relative;" class="pa-0 darkPurpleBackground">
 				<div v-for="room in rooms" :key="room.uuid">
 					<b-button
-						style="width:100%"
 						@click="selectRoom(room)"
 						:style="buttonStyle(room)"
 					>
 						{{ room.name }}
 					</b-button>
 				</div>
+				<div >
+					<b-button
+						class="amenityButton"
+						@click="openAmenities()"
+					>
+						Manage Amenities
+					</b-button>
+				</div>
 			</v-col>
 			<v-col cols="9" >
-				<div class="title darkPurpleText">
-					{{ selectedRoom.name }}
-				</div>
-				<div class="subtitle is-6 darkPurpleText">
-					{{ selectedRoom.subtitle }}
-				</div>
-				<div style="margin: 0 0 25px 0">
-					<div class="darkPurpleText" style='borderBottom: 1px solid #453f54; width:200px !important;'>
-						<b>Description</b>
-					</div>
-					<div class="subtitle is-6">
-						{{ selectedRoom.description }}
-					</div>
-				</div>
-				<div style="margin: 0 0 25px 0">
-					<div class="darkPurpleText" style='borderBottom: 1px solid #453f54; width:200px !important;'>
-						<b>Add-ons</b>
-					</div>
-					<div 
-						v-for="addOn in selectedRoom.addOns" 
-						:key="addOn.uuid"
-					>
-						<div>{{ addOn.name }} - ${{ addOn.cost }}</div>
+
+				<div class="card">
+					<div class="card-content">
+						<div class="content">
+							<v-row>
+								<v-col cols="3">
+									<div class="darkPurpleText">
+										<b>Room Name</b>
+									</div>
+									<div class="subtitle is-6">
+										{{ selectedRoom.name }}
+									</div>
+								</v-col>
+								<v-col cols="3">
+									<div class="darkPurpleText">
+										<b>Subtitle</b>
+									</div>
+									<div class="subtitle is-6">
+										{{ selectedRoom.subtitle }}
+									</div>
+								</v-col>
+								<v-col cols="6">
+									<div>
+										<div class="darkPurpleText" >
+											<b>Description</b>
+										</div>
+										<div class="subtitle is-6">
+											{{ selectedRoom.description }}
+										</div>
+									</div>
+								</v-col>
+							</v-row>
+							<v-row>
+								<v-col >
+									<div>
+										<div class="darkPurpleText" >
+											<b>Add-ons</b>
+										</div>
+										<div 
+											v-for="addOn in selectedRoom.addOns" 
+											:key="addOn.uuid"
+										>
+											<div>{{ addOn.name }} - ${{ addOn.cost }}</div>
+										</div>
+									</div>
+								</v-col>
+								<v-col  >
+									<div class="darkPurpleText">
+										<b>Amenities</b>
+									</div>
+								</v-col>
+							</v-row>
+						</div>
 					</div>
 				</div>
 
@@ -175,6 +188,12 @@
 			@refreshRooms="getRooms()"
 		/>
 
+		<!-- AmenityDialog -->
+		<AmenityDialog 
+			v-if="amenityDialog"
+			@cancel="toggleAmenityDialog()"	
+		/>
+
 	</div>
 </template>
 
@@ -182,6 +201,7 @@
 import axios from 'axios';
 import DeleteDialog from './DeleteDialog';
 import CreateDialog from './CreateDialog';
+import AmenityDialog from './AmenityDialog';
 
 
 export default {
@@ -192,13 +212,14 @@ export default {
 			editDialog: false,
 			deleteDialog: false,
 			createDialog: false,
+			amenityDialog: false,
 			roomToEdit: {
 				addOns: []
 			},
 			selectedRoom: {}
 		}
 	},
-	components: { DeleteDialog, CreateDialog },
+	components: { DeleteDialog, CreateDialog, AmenityDialog },
 	methods: {
 		async getRooms() {
 
@@ -220,12 +241,13 @@ export default {
 		buttonStyle(room) {
 
 			let buttonStyle = {
+				'width':'100%',
 				'color': '#c8b9f0',
 				'borderRadius':'0',
 				'outline': 'none',
-				border: 'none',
+				'border': 'none',
 				'box-shadow': 'none !important',
-				background: 'transparent',
+				'background': 'transparent',
 				'font-family': 'Roboto, sans-serif'
 			};
 
@@ -244,8 +266,15 @@ export default {
 			this.roomToEdit = room
 			this.deleteDialog = true;
 		},
+		openAmenities() {
+			this.amenityDialog = true;
+		},
 		toggleCreateDialog() {
 			this.createDialog = !this.createDialog;
+			this.getRooms();
+		},
+		toggleAmenityDialog() {
+			this.amenityDialog = !this.amenityDialog;
 			this.getRooms();
 		},
 		async saveEdit() {
@@ -300,6 +329,22 @@ input::-webkit-outer-spin-button,
         display: none;
       }
 
+.amenityButton {
+	width:100%;
+	height: 50px;
+	color: #c8b9f0 !important;
+	border-radius: 0;
+	outline: none;
+	border: none;
+	box-shadow: none !important;
+	background: rgb(56, 47, 70);
+	font-family: Roboto, sans-serif;
+	position: absolute;
+	bottom: 0;
+}
 
+.amenityButton:hover {
+	color: white !important;
+}
 
 </style>

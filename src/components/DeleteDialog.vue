@@ -11,7 +11,7 @@
 			<section class="modal-card-body">
 				
 			<div>
-				Are you sure you want to delete the {{ room.name }}
+				Are you sure you want to delete the {{ room.name }}?
 			</div>
 
 			</section>

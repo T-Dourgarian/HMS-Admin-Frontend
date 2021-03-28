@@ -76,106 +76,72 @@
 										</div>
 									</div>
 								</v-col>
-								<v-col  >
-									<div class="darkPurpleText">
-										<b>Amenities</b>
+								<v-col >
+									<div>
+										<div class="darkPurpleText" >
+											<b>Amenities</b>
+										</div>
+										<div 
+											v-for="amenity in selectedRoom.amenities" 
+											:key="amenity.uuid"
+										>
+											<div>{{ amenity.name }}</div>
+										</div>
 									</div>
 								</v-col>
 							</v-row>
+
+							<div class="card-footer">
+								<v-row style="margin:0 !important">
+									<v-col cols='2' class="pb-0">
+										<b-button
+											type="is-primary"
+											outlined
+											icon-left="fas fa-edit"
+											small
+											@click="openEditDialog(selectedRoom)"
+										>
+											Edit
+										</b-button>
+									</v-col>
+									<v-col cols='2' class="pb-0">
+										<b-button
+											type="is-primary"
+											outlined
+											icon-left="fas fa-trash"
+											small
+											@click="openDeleteDialog(selectedRoom)"
+										>
+											Delete
+										</b-button>
+									</v-col>
+								</v-row>
+							</div>
 						</div>
 					</div>
 				</div>
 
 				<div>
-					<v-row>
-						<v-col cols='1'>
-							<b-button
-								type="is-primary"
-								outlined
-								icon-left="fas fa-edit"
-								small
-								@click="openEditDialog(selectedRoom)"
-							>
-								Edit
-							</b-button>
-						</v-col>
-						<v-col cols='1'>
-							<b-button
-								type="is-primary"
-								outlined
-								icon-left="fas fa-trash"
-								small
-								@click="openDeleteDialog(selectedRoom)"
-							>
-								Delete
-							</b-button>
-						</v-col>
-					</v-row>
+
 					
 				</div>
 			</v-col>
 		</v-row>
 
-		<div class="modal" :class="{'is-active': editDialog && roomToEdit}" >
-			<div class="modal-background">				
-			</div>
-			
-			<div class="modal-card">
-				<header class="modal-card-head">
-					<p class="modal-card-title">Edit Room Details</p>
-					<button class="delete" aria-label="close" @click="cancelEdit()"></button>
-				</header>
-				<section class="modal-card-body">
-					<b-field label="Name">
-						<b-input v-model="roomToEdit.name"></b-input>
-					</b-field>
-
-					<b-field label="Sub-title">
-						<b-input v-model="roomToEdit.subtitle"></b-input>
-					</b-field>
-
-					<b-field label="Description">
-						<b-input v-model="roomToEdit.description" maxlength="200" type="textarea" ></b-input>
-					</b-field>
-
-					<span style="font-weight:600">Available add-ons</span>
-					<div v-for="addOn in addOns" :key="addOn.uuid">
-						<div>
-							<b-checkbox 
-								v-model="roomToEdit.addOns"
-								:native-value="addOn"
-							>
-								{{ addOn.name }} ${{ addOn.cost }}
-							</b-checkbox>
-						</div>
-					</div>
-
-
-				</section>
-
-				<footer class="modal-card-foot">
-					<button 
-						class="button is-success"
-						@click="saveEdit()"
-					>
-						Save changes
-					</button>
-					<button 
-						class="button"
-						@click="cancelEdit()"
-					>
-						Cancel
-					</button>
-
-				</footer>
-			</div>
-		</div>
+		<EditDialog 
+			v-if="editDialog"
+			:roomToEdit="selectedRoom"
+			:allAddOns="addOns"
+			:allAmenities="amenities"
+			@cancel="cancelEdit()"
+			@refreshRooms="getRooms()"
+		/>
 
 
 		<!-- delete dialog -->
 		<DeleteDialog 
 			v-if="deleteDialog"
-			:room="roomToEdit" 
+			:room="selectedRoom" 
 			@cancel="deleteDialog = false"	
 			@refreshRooms="getRooms()"
 		/> 
@@ -191,6 +157,9 @@
 		<!-- AmenityDialog -->
 		<AmenityDialog 
 			v-if="amenityDialog"
+			:amenities="amenities"
+			:addOns="addOns"
+			@refreshData="getRooms()"
 			@cancel="toggleAmenityDialog()"	
 		/>
 
@@ -201,6 +170,7 @@
 import axios from 'axios';
 import DeleteDialog from './DeleteDialog';
 import CreateDialog from './CreateDialog';
+import EditDialog from './EditDialog'
 import AmenityDialog from './AmenityDialog';
 
 
@@ -209,27 +179,26 @@ export default {
 		return {
 			rooms: null,
 			addOns: null,
+			amenities: null,
 			editDialog: false,
 			deleteDialog: false,
 			createDialog: false,
 			amenityDialog: false,
-			roomToEdit: {
-				addOns: []
-			},
-			selectedRoom: {}
+			selectedRoom: {
+				addOns:[]
+			}
 		}
 	},
-	components: { DeleteDialog, CreateDialog, AmenityDialog },
+	components: { DeleteDialog, CreateDialog, AmenityDialog, EditDialog },
 	methods: {
 		async getRooms() {
-
 			try {
 				const { data } = await axios.get('http://localhost:3000/api/room');
 
 				this.rooms = data.rooms;
 				this.addOns = data.addOns;
-				this.selectedRoom = data.rooms[0]
-				console.log(this.selectedRoom)
+				this.amenities = data.amenities;
+				this.selectedRoom = JSON.parse(JSON.stringify(data.rooms[0]));
 
 			} catch(error) {
 				console.log(error);
@@ -259,11 +228,11 @@ export default {
 			return buttonStyle;
 		},
 		openEditDialog(room) {
-			this.roomToEdit = room;
+			this.selectedRoom = room;
 			this.editDialog = true;
 		},
 		openDeleteDialog(room) {
-			this.roomToEdit = room
+			this.selectedRoom = room;
 			this.deleteDialog = true;
 		},
 		openAmenities() {
@@ -271,25 +240,10 @@ export default {
 		},
 		toggleCreateDialog() {
 			this.createDialog = !this.createDialog;
-			this.getRooms();
 		},
 		toggleAmenityDialog() {
 			this.amenityDialog = !this.amenityDialog;
 			this.getRooms();
-		},
-		async saveEdit() {
-			try {
-
-				console.log(this.roomToEdit)
-
-				await axios.put(`http://localhost:3000/api/room/update/${this.roomToEdit.uuid}`, this.roomToEdit)
-
-				this.getRooms();				
-				
-				this.editDialog = false;
-			} catch(error) {
-				console.log(error);
-			}
 		},
 		cancelEdit() {
 			this.editDialog = false;

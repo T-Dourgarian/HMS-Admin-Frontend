@@ -100,12 +100,13 @@ export default {
 				subtitle: null,
 				description: null,
 				basePrice: null,
-				addOns: []
+				addOns: [],
+				amenities: []
 			},
 			createLoading: false,
 		}
 	},
-	props: ['addOns'],
+	props: ['addOns', 'amenities'],
 	methods: {
 		cancelCreate() {
 			this.$emit('cancel');

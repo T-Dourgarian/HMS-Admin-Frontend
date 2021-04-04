@@ -3,8 +3,8 @@ import VueRouter from 'vue-router';
 //components
 
 // import Main from './components/Main.vue'
-import Room from './components/Room.vue'
-import Calendar from './components/Calendar.vue';
+import Room from './components/Room/Room.vue'
+import Calendar from './components/Calendar/Calendar.vue';
 
 
 const routes = [

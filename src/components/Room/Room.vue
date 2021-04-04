@@ -12,6 +12,21 @@
 		
 		<v-row style="height: 92vh; maxHeight: 92vh; margin: 0 !important;">
 			<v-col cols="3" style="maxHeight: inherit; position: relative;" class="pa-0 darkPurpleBackground">
+				<div >
+					<b-button
+						class="createButton"
+						@click="toggleCreateDialog()"
+					>
+						<v-row align="center" justify="center">
+							<v-col class="px-0">
+								<v-icon style="margin: auto" small color="rgb(238, 238, 238)">fas fa-plus</v-icon>
+							</v-col>
+							<v-col>
+								Create Room
+							</v-col>
+						</v-row>
+					</b-button>
+				</div>
 				<div v-for="room in rooms" :key="room.uuid">
 					<b-button
 						@click="selectRoom(room)"
@@ -299,6 +314,20 @@ input::-webkit-outer-spin-button,
 
 .amenityButton:hover {
 	color: white !important;
+}
+
+.createButton {
+	width: 100%;
+	height: 50px;
+	background-color: #7957d5;
+	color:rgb(238, 238, 238);
+	border-radius: 0;
+	outline: none;
+	border: none;
+}
+
+.createButton:hover {
+	color:rgb(238, 238, 238) !important
 }
 
 </style>

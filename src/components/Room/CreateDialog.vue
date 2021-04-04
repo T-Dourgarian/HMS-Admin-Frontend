@@ -67,6 +67,15 @@
 						</b-checkbox>
 					</div>
 				</div>
+
+				<b-field label="Number Of Rooms" style="margin: 10px 0 0 0">
+					<b-input 
+						v-model="newRoom.numberOfRooms"
+						placeholder="Number of Rooms"
+						type="number"
+					>
+					</b-input>
+				</b-field>
 			</section>
 
 			<footer class="modal-card-foot">
@@ -100,6 +109,7 @@ export default {
 				subtitle: null,
 				description: null,
 				basePrice: null,
+				numberOfRooms: null,
 				addOns: [],
 				amenities: []
 			},

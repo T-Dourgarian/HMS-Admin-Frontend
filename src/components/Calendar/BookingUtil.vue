@@ -264,8 +264,8 @@ export default {
 			try {
 				const { data } = await axios.get('http://localhost:3000/api/room/listings', {
 					params: {
-						checkIn: this.checkInOut[0].toISOString().split('T')[0],
-						checkOut: this.checkInOut[1].toISOString().split('T')[0]
+						checkIn: this.checkInOut,
+						checkOut: this.checkInOut
 					}
 				});
 

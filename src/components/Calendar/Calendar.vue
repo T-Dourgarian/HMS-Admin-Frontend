@@ -104,8 +104,8 @@
 							flat
 						>
 							<v-toolbar
-							:color="selectedEvent.color"
-							dark
+								:color="selectedEvent.color"
+								dark
 							>
 								<v-toolbar-title v-if="selectedEvent.checkIn">
 									<v-row align="center" justify="center">
@@ -119,6 +119,14 @@
 										<v-col style="fontSize: 13px;">
 											Check Out:
 											<span style="margin: auto 0 auto 5px;">{{ selectedEvent.checkOut.getMonth() + 1 }}/{{ selectedEvent.checkOut.getDate() }}</span>
+										</v-col>
+										<v-col>
+											<v-btn 
+												icon
+												@click="openEditDialog(selectedEvent)"
+											>
+												<v-icon>fas fa-pencil-alt</v-icon>
+											</v-btn>	
 										</v-col>
 										<v-col>
 											<v-btn 
@@ -139,8 +147,20 @@
 											<v-col>
 												<div style="font-size:15px"><b>Details</b></div>
 												<div>
-													<v-icon small>fas fa-hotel</v-icon> 
+													<v-icon small>fas fa-door-closed</v-icon> 
 													<span style="margin: 0 0 0 5px;">Room - </span>
+													<span style="margin: auto 0 auto 5px;"> {{ selectedEvent.roomNumber }}</span>
+												</div>
+
+												<div>
+													<v-icon small>fas fa-layer-group</v-icon> 
+													<span style="margin: 0 0 0 5px;">Floor - </span>
+													<span style="margin: auto 0 auto 5px;"> {{ selectedEvent.floorNumber }}</span>
+												</div>
+
+												<div>
+													<v-icon small>fas fa-hotel</v-icon> 
+													<span style="margin: 0 0 0 5px;">Room Type - </span>
 													<span style="margin: auto 0 auto 5px;"> {{ selectedEvent.roomName }}</span>
 												</div>
 
@@ -160,8 +180,20 @@
 										<v-row>
 											<v-col>
 												<div style="font-size:15px"><b>Add-ons</b></div>
-												<div v-for="addOn in selectedEvent.addOns" :key="addOn.uuid">
-													<span style="margin: auto 0 auto 5px;"> - {{ addOn.name }}</span>
+												<div v-if="selectedEvent.addOns[0]">
+													<div 
+														v-for="addOn in selectedEvent.addOns" 
+														:key="addOn.uuid"
+														
+													>
+														<span style="margin: auto 0 auto 5px;"> - {{ addOn.name }}</span>
+													</div>
+												</div>
+
+												<div 
+													v-else
+												>
+													<span style="margin: auto 0 auto 5px;"> N/A</span>
 												</div>
 											</v-col>
 										</v-row>
@@ -212,7 +244,7 @@
 
 						<section class="modal-card-body">
 							<div>
-								Are you sure you want to cancel the booking for <b>{{ bookingToDelete.customerName }}</b>?
+								Are you sure you want to cancel the booking for <b>{{ bookingToEdit.customerName }}</b>?
 							</div>
 						</section>
 
@@ -234,13 +266,23 @@
 						</footer>
 					</div>
 				</div>
+				
+				<!-- edit booking modal -->
+				<EditDialog 
+					v-if="editDialog"
+					:booking="bookingToEdit"
+					@close="editDialog = false;"
+				/>
+
 		</v-col>
 	</v-row>
 </template>
 
 <script>
 import axios from 'axios';
-import BookingUtil from './BookingUtil'
+import BookingUtil from './BookingUtil';
+import EditDialog from './EditDialog';
+
 export default {
     data: () => ({
 		today: new Date().toISOString().substring(0,10),
@@ -257,16 +299,19 @@ export default {
 		start: [],
 		end: [],
 		currentlyEditing: null,
-		selectedEvent: {},
+		selectedEvent: {
+			addOns: []
+		},
 		selectedElement: null,
 		selectedOpen: false,
 		events: [],
-		bookingToDelete: {},
 		deleteDialog: false,
 		deleteBookingLoading: false,
+		bookingToEdit: {},
+		editDialog: false,
 		colors: 'blue'
     }),
-	components : { BookingUtil },
+	components : { EditDialog, BookingUtil },
     created () {
       this.getBookings();
     },
@@ -275,10 +320,14 @@ export default {
 			try {
 				const { data } = await axios.get('http://localhost:3000/api/booking');
 
+				console.log(data.bookings)
+
 				this.events = data.bookings.map(booking => {
 					return {
 						uuid: booking.uuid,
-						name: booking.customerDetails.name,
+						room: booking.room[0],
+						roomType: booking.roomType[0],
+						name: booking.customerDetails.name + ' | Room - ' +  booking.room[0].roomNumber,
 						details: 'Booking',
 						start: booking.checkIn.substring(0,10),
 						end: booking.checkOut.substring(0,10),
@@ -288,10 +337,12 @@ export default {
 						customerName: booking.customerDetails.name ? booking.customerDetails.name : 'N/A',
 						customerPhoneNumber: booking.customerDetails.phoneNumber  ? booking.customerDetails.phoneNumber : 'N/A',
 						customerEmail: booking.customerDetails.email ? booking.customerDetails.email : 'N/A',
-						roomName: booking.room[0].name,
+						roomName: booking.roomType[0].name,
 						addOns: booking.addOns,
 						numberOfGuests: booking.numberOfGuests,
-						numberOfNights: booking.numberOfNights
+						numberOfNights: booking.numberOfNights,
+						roomNumber: booking.room[0].roomNumber,
+						floorNumber: booking.room[0].floor
 					}
 				});
 			} catch(error) {
@@ -300,7 +351,7 @@ export default {
 		},
 		async deleteBooking() {
 			try {
-				await axios.delete(`http://localhost:3000/api/booking/cancel/${this.bookingToDelete.uuid}`);
+				await axios.delete(`http://localhost:3000/api/booking/cancel/${this.bookingToEdit.uuid}`);
 
 				this.getBookings();
 
@@ -310,8 +361,12 @@ export default {
 			}
 		},
 		openDeleteDialog(booking) {
-			this.bookingToDelete = booking;
+			this.bookingToEdit = booking;
 			this.deleteDialog = true; 
+		},
+		openEditDialog(booking) {
+			this.bookingToEdit = booking;
+			this.editDialog = true;
 		},
 		viewDay ({ date }) {
 			this.focus = date

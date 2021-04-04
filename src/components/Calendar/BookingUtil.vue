@@ -264,14 +264,15 @@ export default {
 			try {
 				const { data } = await axios.get('http://localhost:3000/api/room/listings', {
 					params: {
-						checkIn: this.checkInOut,
-						checkOut: this.checkInOut
+						checkIn: this.checkInOut[0],
+						checkOut: this.checkInOut[1]
 					}
 				});
 
 				this.listings = data;
 				this.listingToBook = data[0];
 
+				console.log(data);
 
 
 			} catch(error) {

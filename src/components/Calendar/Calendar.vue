@@ -91,7 +91,6 @@
 						@click:event="showEvent"
 						@click:more="viewDay"
 						@click:date="viewDay"
-						
 						></v-calendar>
 						<v-menu
 						v-model="selectedOpen"
@@ -272,6 +271,7 @@
 					v-if="editDialog"
 					:booking="bookingToEdit"
 					@close="editDialog = false;"
+					@refresh="getBookings()"
 				/>
 
 		</v-col>
@@ -308,8 +308,7 @@ export default {
 		deleteDialog: false,
 		deleteBookingLoading: false,
 		bookingToEdit: {},
-		editDialog: false,
-		colors: 'blue'
+		editDialog: false
     }),
 	components : { EditDialog, BookingUtil },
     created () {
@@ -319,8 +318,6 @@ export default {
 		async getBookings() {
 			try {
 				const { data } = await axios.get('http://localhost:3000/api/booking');
-
-				console.log(data.bookings)
 
 				this.events = data.bookings.map(booking => {
 					return {
@@ -369,39 +366,41 @@ export default {
 			this.editDialog = true;
 		},
 		viewDay ({ date }) {
-			this.focus = date
-			this.type = 'day'
+			this.focus = date;
+			this.type = 'day';
 		},
       getEventColor (event) {
-        return event.color
+        return event.color;
       },
       setToday () {
-        this.focus = ''
+        this.focus = '';
       },
       prev () {
-        this.$refs.calendar.prev()
+        this.$refs.calendar.prev();
       },
       next () {
-		this.$refs.calendar.next()
+		this.$refs.calendar.next();
       },
       showEvent ({ nativeEvent, event }) {
 
+		console.log('asdfasdf')
+
         const open = () => {
-          this.selectedEvent = event
-          this.selectedElement = nativeEvent.target
+          this.selectedEvent = event;
+          this.selectedElement = nativeEvent.target;
           setTimeout(() => {
-            this.selectedOpen = true
+            this.selectedOpen = true;
           }, 10)
         }
 
         if (this.selectedOpen) {
-          this.selectedOpen = false
-          setTimeout(open, 10)
+          this.selectedOpen = false;
+          setTimeout(open, 10);
         } else {
-          open()
+          open();
         }
 
-        nativeEvent.stopPropagation()
+        nativeEvent.stopPropagation();
       },
 		rnd (a, b) {
 			return Math.floor((b - a + 1) * Math.random()) + a

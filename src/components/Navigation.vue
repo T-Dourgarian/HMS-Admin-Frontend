@@ -20,12 +20,12 @@
         <template #end>
             <b-navbar-item tag="div">
                 <div class="buttons">
-                    <a class="button is-primary">
-                        <strong>Sign up</strong>
-                    </a>
-                    <a class="button is-light">
-                        Log in
-                    </a>
+                    <b-button
+						type="is-primary"
+						@click="logOut()"
+					>
+						Log Out
+					</b-button>
                 </div>
             </b-navbar-item>
         </template>
@@ -34,6 +34,15 @@
 
 <script>
 export default {
+	methods: {
+		logOut() {
+
+			console.log(this.$store.state)
+
+			this.$router.push(`/login/${this.$store.state.user.company.name}`);
+			this.$store.commit('clearAuth');
+		}
+	},
 	computed: {
 		navbarStyle: () => {
 			return {

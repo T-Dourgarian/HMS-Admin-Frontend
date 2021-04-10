@@ -317,7 +317,8 @@ export default {
     methods: {
 		async getBookings() {
 			try {
-				const { data } = await axios.get('http://localhost:3000/api/booking');
+
+				const { data } = await axios.get(`http://localhost:3000/api/booking/${this.$store.state.user.company.uuid}`);
 
 				this.events = data.bookings.map(booking => {
 					return {

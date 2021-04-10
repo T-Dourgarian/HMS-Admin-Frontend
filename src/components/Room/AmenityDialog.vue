@@ -150,7 +150,8 @@ export default {
 				if (this.amenityName && this.selectedIcon) {
 					await axios.post('http://localhost:3000/api/amenity/create', {
 						name: this.amenityName,
-						icon: this.selectedIcon
+						icon: this.selectedIcon,
+						companyUuid: this.$store.state.user.company.uuid
 					});
 
 					this.selectedIcon = null;
@@ -172,7 +173,8 @@ export default {
 
 					await axios.post('http://localhost:3000/api/addon/create', {
 						name: this.addOnName,
-						cost: this.addOnPrice
+						cost: this.addOnPrice,
+						companyUuid: this.$store.state.user.company.uuid
 					});
 
 

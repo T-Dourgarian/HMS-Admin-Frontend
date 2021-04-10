@@ -208,7 +208,7 @@ export default {
 	methods: {
 		async getRooms() {
 			try {
-				const { data } = await axios.get('http://localhost:3000/api/room');
+				const { data } = await axios.get(`http://localhost:3000/api/room/${this.$store.state.user.company.uuid}`);
 
 				this.rooms = data.rooms;
 				this.addOns = data.addOns;

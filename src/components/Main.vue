@@ -1,6 +1,6 @@
 <template>
 	<div style="height: 100vh">
-		<div>
+		<div v-if="$store.state.user.loggedIn">
 			<Navigation />
 		</div>
 		<div style="background: rgb(238, 238, 238)">

@@ -233,6 +233,7 @@ export default {
 					await axios.post('http://localhost:3000/api/booking/create',
 						{
 							roomUuid: this.newBooking.roomUuid,
+							companyUuid: this.$store.state.user.company.uuid,
 							addOns: this.addOns,
 							checkIn: this.checkInOut[0],
 							checkOut: this.checkInOut[1],
@@ -262,10 +263,14 @@ export default {
 		},
 		async getListings() {
 			try {
+
+				console.log(this.$store.state.user.company.uuid)
+
 				const { data } = await axios.get('http://localhost:3000/api/room/listings', {
 					params: {
 						checkIn: this.checkInOut[0],
-						checkOut: this.checkInOut[1]
+						checkOut: this.checkInOut[1],
+						companyUuid: this.$store.state.user.company.uuid
 					}
 				});
 

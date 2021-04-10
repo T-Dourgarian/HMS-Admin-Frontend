@@ -129,7 +129,10 @@ export default {
 				if (this.validInputs) {
 					this.createLoading = true;
 
-					await axios.post('http://localhost:3000/api/room/create', this.newRoom);
+					await axios.post(`http://localhost:3000/api/room/create`, {
+						...this.newRoom, 
+						companyUuid: this.$store.state.user.company.uuid
+					});
 
 					this.$buefy.toast.open({
 						duration: 2500,

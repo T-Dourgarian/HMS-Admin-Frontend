@@ -50,6 +50,22 @@
 						</div>
 					</v-col>
 				</v-row>
+
+				<v-row>
+					<v-col>
+						<b-field class="file is-primary" :class="{'has-name': !!file}">
+							<b-upload v-model="file" class="file-label" @input="handleImageSelect">
+								<span class="file-cta">
+									<b-icon class="file-icon" icon="upload"></b-icon>
+									<span class="file-label">Click to upload</span>
+								</span>
+								<span class="file-name" v-if="file">
+									{{ file.name }}
+								</span>
+							</b-upload>
+						</b-field>
+					</v-col>
+				</v-row>
 			</section>
 
 			<footer class="modal-card-foot">
@@ -82,7 +98,8 @@ export default {
 				amenities: []
 			},
 			addOns: [],
-			amenities: []
+			amenities: [],
+			file: null
 		}
 	},
 	props: ['roomToEdit', 'allAddOns', 'allAmenities'],
@@ -94,23 +111,56 @@ export default {
 
 				await axios.put(`http://localhost:3000/api/room/update/${this.roomToEdit.uuid}`, this.room)
 
+				if (this.file) {
+					this.uploadImage();
+				}
+
+				this.closeEdit();
 				this.$emit('refreshRooms');		
 				
-				this.closeEdit();
 			} catch(error) {
 				console.log(error);
 			}
 		},
 		closeEdit() {
 			this.$emit('cancel');
+		},
+		handleImageSelect(file) {
+			this.file = file;
+		},
+		async uploadImage() {
+			try {
+
+				let formData = new FormData();
+				formData.append("image", this.file);
+				formData.append("name", this.file.name);
+				formData.append("roomTypeUuid", this.room.uuid);
+
+
+				const { data } = await axios.post('http://localhost:3000/api/image/upload', 
+					formData,
+				{
+					headers: {
+						'Content-Type': 'multipart/form-data'
+					}
+				});
+
+				console.log(data);
+
+			} catch(error) {
+				console.log(error);
+			}
 		}
 	},
 	created() {
 
+		
 		this.room = JSON.parse(JSON.stringify(this.roomToEdit));
 		this.addOns = JSON.parse(JSON.stringify(this.allAddOns));
 		this.amenities = JSON.parse(JSON.stringify(this.allAmenities));
 
+		console.log(this.addOns)
+		console.log(this.room.addOns)
 	}
 }
 </script>

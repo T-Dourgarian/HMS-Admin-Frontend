@@ -153,8 +153,6 @@
 							<div> Room: ${{ newBooking.roomPrice }} </div>
 							<div> Add-ons: ${{ newBooking.addOnPrice }} </div>
 							<div> Total: ${{ newBooking.totalPrice }} </div>
-							
-							
 						</section>
 
 						<footer class="modal-card-foot">
@@ -215,9 +213,7 @@ export default {
 				roomPrice: 0.00,
 				addOnPrice: 0.00,
 				totalPrice: 0.00,
-				roomUuid: null,
-				listingUuids: null,
-				allDates: []
+				roomTypeUuid: null,
 			}
 		}
 	},
@@ -228,11 +224,12 @@ export default {
 		async createBooking() {
 			try {
 				this.createBookingLoading = true;
-				if (this.newBooking.roomUuid) {
+				if (this.newBooking.roomTypeUuid) {
 					
 					await axios.post('http://localhost:3000/api/booking/create',
 						{
 							roomUuid: this.newBooking.roomUuid,
+							roomTypeUuid: this.newBooking.roomTypeUuid,
 							companyUuid: this.$store.state.user.company.uuid,
 							addOns: this.addOns,
 							checkIn: this.checkInOut[0],
@@ -252,9 +249,9 @@ export default {
 
 					this.$emit('refreshBookings');
 				} else {
-					this.errorMsg = "You must fill the missing fields before booking";
+					this.errorMsg = "You must fill all the fields before booking";
 				}
-				this.createBookingLoading = true;
+				this.createBookingLoading = false;
 
 			} catch(error) {
 				this.createBookingLoading = false;
@@ -263,8 +260,6 @@ export default {
 		},
 		async getListings() {
 			try {
-
-				console.log(this.$store.state.user.company.uuid)
 
 				const { data } = await axios.get('http://localhost:3000/api/room/listings', {
 					params: {
@@ -300,7 +295,7 @@ export default {
 					addOnCosts += addOn.cost
 				});
 
-				this.newBooking.roomUuid = listing.uuid;
+				this.newBooking.roomTypeUuid = listing.uuid;
 				this.newBooking.roomName = listing.name;
 				this.newBooking.roomPrice = listing.basePrice;
 				this.newBooking.addOnPrice = addOnCosts;

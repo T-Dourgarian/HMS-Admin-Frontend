@@ -100,9 +100,24 @@
 											v-for="amenity in selectedRoom.amenities" 
 											:key="amenity.uuid"
 										>
-											<div>{{ amenity.name }}</div>
+											<v-icon small >fas fa-{{ amenity.icon }}</v-icon><span> {{ amenity.name }}</span>
 										</div>
 									</div>
+								</v-col>
+								<v-col cols="6">
+									<b-carousel
+										:pause-hover="false"
+										:autoplay="false"
+										style="height:400px"
+									>
+										<b-carousel-item v-for="(image, i) in selectedRoom.images" :key="i">
+											<section >
+												
+													<img style="height:400px" :src="'http://localhost:3000' + image.path" alt="">
+												
+											</section>
+										</b-carousel-item>
+									</b-carousel>
 								</v-col>
 							</v-row>
 

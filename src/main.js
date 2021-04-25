@@ -12,7 +12,7 @@ router.beforeEach((to, from, next) => {
 		// this route requires auth, check if logged in
 		// if not, redirect to login page.
 		if (!store.state.user.loggedIn) {
-			next({ name: 'Login' })
+			next({ name: '404' })
 		} else {
 			next() // go to wherever I'm going
 		}

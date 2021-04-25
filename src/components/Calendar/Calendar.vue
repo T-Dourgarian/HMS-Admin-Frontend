@@ -349,6 +349,9 @@ export default {
 		},
 		async deleteBooking() {
 			try {
+
+				console.log(this.bookingToEdit.uuid)
+
 				await axios.delete(`http://localhost:3000/api/booking/cancel/${this.bookingToEdit.uuid}`);
 
 				this.getBookings();
@@ -359,6 +362,9 @@ export default {
 			}
 		},
 		openDeleteDialog(booking) {
+
+			console.log(booking)
+
 			this.bookingToEdit = booking;
 			this.deleteDialog = true; 
 		},
@@ -383,9 +389,6 @@ export default {
 		this.$refs.calendar.next();
       },
       showEvent ({ nativeEvent, event }) {
-
-		console.log('asdfasdf')
-
         const open = () => {
           this.selectedEvent = event;
           this.selectedElement = nativeEvent.target;

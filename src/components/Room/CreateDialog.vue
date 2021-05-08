@@ -27,7 +27,7 @@
 				<b-field label="Description">
 					<b-input 
 						v-model="newRoom.description" 
-						maxlength="200" 
+						maxlength="400" 
 						type="textarea" 
 						required 
 					></b-input>

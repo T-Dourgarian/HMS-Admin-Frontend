@@ -74,11 +74,23 @@
 								></b-input>
 							</v-col>
 							
-							<v-col cols="12" >
+							<v-col class="pb-0" cols="12" >
+								<b-input 
+									type="textarea"
+									maxlength="100"
+									v-model="addOnDescription"
+									placeholder="Desciprion"
+								></b-input>
+							</v-col>
+
+
+
+							<v-col class="pt-0" cols="12" >
 								<b-input 
 									type="number"
 									v-model="addOnPrice"
 									placeholder="Price"
+									icon="fas fa-dollar-sign"
 								></b-input>
 							</v-col>
 
@@ -137,7 +149,8 @@ export default {
 			amenityErrorMsg: null,
 			addOnErrorMsg: null,
 			addOnName: null,
-			addOnPrice: null
+			addOnPrice: null,
+			addOnDescription: null
 		}
 	}, 
 	props: ['amenities', 'addOns'],
@@ -167,19 +180,21 @@ export default {
 			}
 		},
 		async createAddOn() {
-			if (this.addOnName && this.addOnPrice) {
+			if (this.addOnName && this.addOnPrice && this.addOnDescription) {
 
 					this.addOnErrorMsg = '';
 
 					await axios.post('http://localhost:3000/api/addon/create', {
 						name: this.addOnName,
 						cost: this.addOnPrice,
+						description: this.addOnDescription,
 						companyUuid: this.$store.state.user.company.uuid
 					});
 
 
 					this.addOnName = null;
 					this.addOnPrice = null;
+					this.addOnDescription = null;
 
 					this.refreshData();
 

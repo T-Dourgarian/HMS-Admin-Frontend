@@ -177,6 +177,8 @@ export default {
 
 				this.getBookings();
 
+				this.checkInOutDialog = false;
+
 			} catch(error) {
 				error
 			}

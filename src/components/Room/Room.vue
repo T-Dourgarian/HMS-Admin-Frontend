@@ -111,8 +111,7 @@
 										style="height:400px"
 									>
 										<b-carousel-item v-for="(image, i) in selectedRoom.images" :key="i">
-											<section >
-												
+											<section>
 													<img style="height:400px" :src="'http://localhost:3000' + image.path" alt="">
 												
 											</section>

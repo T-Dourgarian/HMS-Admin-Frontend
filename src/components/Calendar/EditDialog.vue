@@ -94,7 +94,7 @@
 				<v-row class="px-0 pt-0 pb-2 ma-0" align="center">
 					<v-col cols="2" class="pa-0 ma-0">
 						<div class="inputLabel">
-							# Of Guests
+							No. of Guests
 						</div>
 					</v-col>
 					<v-col cols="10" class="pa-0 ma-0">
@@ -118,7 +118,6 @@
 					</v-col>
 					<v-col cols="10" class="pa-0 ma-0">
 						<b-select 
-							placeholder="Select a Room" 
 							v-model="bookingEdit.roomType"
 							style="width:200px !important"
 							@input="roomTypeUpdateHandler()"
@@ -273,15 +272,16 @@ export default {
 					params: {
 						checkIn: this.checkInOut[0],
 						checkOut: this.checkInOut[1],
+						numOfGuests: this.bookingEdit.numberOfGuests,
+						companyUuid: this.$store.state.user.company.uuid,
 						bookingUuid: this.bookingEdit.uuid
 					}
 				});
 
-				// console.log(data)
-
 				this.roomTypes = data.roomTypes;
 				this.rooms = data.rooms;
-				this.roomsAll = data.rooms
+				this.roomsAll = data.rooms;
+
 
 			}catch(error) {
 				console.log(error);
@@ -409,6 +409,9 @@ export default {
 
 		this.bookingEdit = JSON.parse(JSON.stringify(this.booking));
 		this.checkInOut = [ this.booking.checkIn, this.booking.checkOut ]
+
+		this.bookingEdit.numberOfGuests = 2;
+
 	},
 	watch: {
 		checkInOut() {

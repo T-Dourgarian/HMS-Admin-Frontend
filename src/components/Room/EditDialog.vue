@@ -51,7 +51,7 @@
 					</v-col>
 				</v-row>
 
-				<v-row>
+				<v-row class="ma-0">
 					<v-col>
 						<b-field class="file is-primary" :class="{'has-name': !!file}">
 							<b-upload v-model="file" class="file-label" @input="handleImageSelect">
@@ -64,6 +64,12 @@
 								</span>
 							</b-upload>
 						</b-field>
+					</v-col>
+				</v-row>
+				<v-row class="ma-0">
+					<v-col cols="12" v-for="(image, i) in room.images" :key="i" class="imageContainer">
+						<b-button size="is-small" type="is-danger" icon-left="fas fa-times" class="deleteImageButton" @click="handleImageDelete(image.uuid)"></b-button>
+						<img :style="{height:'auto', border: imagesToDelete.includes(image.uuid) ? '1px solid red' : '' }" :src="'http://localhost:3000' + image.path" alt="">
 					</v-col>
 				</v-row>
 			</section>
@@ -81,6 +87,10 @@
 				>
 					Cancel
 				</button>
+
+				<div v-if="imagesToDelete.length">
+					Deleting {{ imagesToDelete.length }} images
+				</div>
 			</footer>
 		</div>
 	</div>
@@ -97,6 +107,7 @@ export default {
 				addOns: [],
 				amenities: []
 			},
+			imagesToDelete:[],
 			addOns: [],
 			amenities: [],
 			file: null
@@ -115,8 +126,14 @@ export default {
 					this.uploadImage();
 				}
 
-				this.closeEdit();
+				if (this.imagesToDelete.length) {
+					for (let uuid of this.imagesToDelete) {
+						this.deleteImage(uuid);
+					}
+				}
+
 				this.$emit('refreshRooms');		
+				this.closeEdit();
 				
 			} catch(error) {
 				console.log(error);
@@ -127,6 +144,14 @@ export default {
 		},
 		handleImageSelect(file) {
 			this.file = file;
+		},
+		handleImageDelete(uuid) {
+			if (this.imagesToDelete.includes(uuid)) {
+				this.imagesToDelete = this.imagesToDelete.filter(image => image !== uuid);
+			} else {
+				this.imagesToDelete.push(uuid);
+			}
+
 		},
 		async uploadImage() {
 			try {
@@ -150,21 +175,37 @@ export default {
 			} catch(error) {
 				console.log(error);
 			}
-		}
+		},
+		async deleteImage(uuid) {
+			try {
+
+				await axios.delete(`http://localhost:3000/api/image/delete/${uuid}`);
+
+			} catch(error) {
+				console.log(error);
+			}
+		},
 	},
 	created() {
 
-		
 		this.room = JSON.parse(JSON.stringify(this.roomToEdit));
 		this.addOns = JSON.parse(JSON.stringify(this.allAddOns));
 		this.amenities = JSON.parse(JSON.stringify(this.allAmenities));
 
-		console.log(this.addOns)
-		console.log(this.room.addOns)
 	}
 }
 </script>
 
 <style>
+
+.imageContainer {
+	position: relative;
+}
+
+.deleteImageButton {
+	position: absolute;
+	left:93%;
+	top:9%;
+}
 
 </style>

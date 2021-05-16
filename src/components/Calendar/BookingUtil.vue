@@ -17,7 +17,7 @@
 				<b-input 
 					v-model="newBooking.numberOfGuests" 
 					custom-class="darkPurpleText purpleBackground" 
-					placeholder="# of Guests"
+					placeholder="No. of Guests"
 				></b-input>
 
 				<v-divider></v-divider>
@@ -208,7 +208,7 @@ export default {
 					phoneNumber: null,
 				},
 				roomName: null,
-				numberOfGuests: null,
+				numberOfGuests: 2,
 				numberOfNights: 0,
 				roomPrice: 0.00,
 				addOnPrice: 0.00,
@@ -260,11 +260,12 @@ export default {
 		},
 		async getListings() {
 			try {
-
+				console.log(this.newBooking.numberOfGuests)
 				const { data } = await axios.get('http://localhost:3000/api/room/listings', {
 					params: {
 						checkIn: this.checkInOut[0],
 						checkOut: this.checkInOut[1],
+						numOfGuests: this.newBooking.numberOfGuests,
 						companyUuid: this.$store.state.user.company.uuid
 					}
 				});

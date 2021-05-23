@@ -1,11 +1,11 @@
 <template>
-	<v-row style="margin: 0 !important; height: 92vh; maxHeight: 92vh;">
-		<v-col class='col-3 element' style="backgroundColor:#453f54; maxHeight: inherit !important; overflow-y:auto !important;">
+	<v-row style="margin: 0 !important; height:100vh; maxHeight: 100vh;">
+		<v-col class='col-3 element bookingUtil'>
 			<BookingUtil 
 				@refreshBookings="getBookings()" 
 			/>
 		</v-col>
-		<v-col class='col-9'>
+		<v-col cols="9" class='px-2 pb-0'>
 			<v-row class="fill-height">
 				<v-col>
 					<v-sheet height="64">
@@ -417,5 +417,11 @@ export default {
 
 
 .element::-webkit-scrollbar { width: 0 !important }
+
+.bookingUtil {
+	background-color:#453f54; 
+	max-height: inherit !important; 
+	overflow-y:auto !important;
+}
 
 </style>

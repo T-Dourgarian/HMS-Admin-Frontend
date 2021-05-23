@@ -25,21 +25,21 @@ const routes = [
 		component: Login
 	},
 	{ 
-		path: '/room', 
+		path: '/Rooms', 
 		component: Room,
 		meta: {
 			requiresAuth: true
 		} 
 	},
 	{ 
-		path: '/calendar', 
+		path: '/Calendar', 
 		component: Calendar,
 		meta: {
 			requiresAuth: true
 		} 
 	},
 	{ 
-		path: '/dashboard', 
+		path: '/Dashboard', 
 		component: Dashboard,
 		meta: {
 			requiresAuth: true

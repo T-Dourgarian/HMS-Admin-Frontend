@@ -10,7 +10,7 @@
 
 
 		
-		<v-row style="height: 92vh; maxHeight: 92vh; margin: 0 !important;">
+		<v-row class="ma-0" style="height: 100vh">
 			<v-col cols="3" style="maxHeight: inherit; position: relative;" class="pa-0 darkPurpleBackground">
 				<div >
 					<b-button
@@ -111,7 +111,7 @@
 										style="height:400px"
 									>
 										<b-carousel-item v-for="(image, i) in selectedRoom.images" :key="i">
-											<section>
+											<section> 
 													<img style="height:400px" :src="'http://localhost:3000' + image.path" alt="">
 												
 											</section>
@@ -250,7 +250,8 @@ export default {
 			};
 
 			if (this.selectedRoom.uuid == room.uuid) {
-				buttonStyle.color = '#e0d9f3'
+				buttonStyle.color = '#e0d9f3';
+				buttonStyle.background = '#665e79';
 			}
 
 

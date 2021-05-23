@@ -1,12 +1,14 @@
 <template>
-	<div style="height: 100vh">
-		<div v-if="$store.state.user.loggedIn">
-			<Navigation />
-		</div>
-		<div style="background: rgb(238, 238, 238)">
-			<router-view></router-view>
-		</div>
-	</div>
+	<v-row class="ma-0 pa-0" style="height: 100vh">
+			<div style="width:50px" v-if="$store.state.user.loggedIn" >
+				<Navigation />
+			</div>
+			
+			<v-col class="pa-0">
+				<router-view></router-view>
+			</v-col>
+			
+	</v-row>
 </template>
 
 <script>

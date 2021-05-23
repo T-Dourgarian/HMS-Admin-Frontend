@@ -1,5 +1,5 @@
 <template>
-	<b-navbar :style="navbarStyle">
+	<!-- <b-navbar :style="navbarStyle">
         <template #brand>
             <b-navbar-item tag="router-link" :to="{ path: '/dashboard' }">
                 HMS
@@ -29,11 +29,66 @@
                 </div>
             </b-navbar-item>
         </template>
-    </b-navbar>
+    </b-navbar> -->
+
+    <v-navigation-drawer
+      absolute
+      light
+      expand-on-hover
+		class="navbar"
+    >
+      <v-list>
+        <v-list-item
+          v-for="item in items"
+          :key="item.title"
+          link
+          :to="`/${item.title}`" 
+        >
+          <v-list-item-icon>
+            <v-icon>{{ item.icon }}</v-icon>
+          </v-list-item-icon>
+
+          <v-list-item-content>
+            <v-list-item-title  > {{ item.title }} </v-list-item-title>
+          </v-list-item-content>
+        </v-list-item>
+
+		<v-list-item
+			link
+		>
+			<v-list-item-icon>
+            <v-icon>fas fa-sign-out-alt</v-icon>
+          </v-list-item-icon>
+
+          <v-list-item-content>
+            <v-list-item-title @click="logOut()" > Log out </v-list-item-title>
+          </v-list-item-content>
+		</v-list-item>
+      </v-list>
+    </v-navigation-drawer>
+
 </template>
 
 <script>
 export default {
+	data() {
+		return {
+			items: [
+				{
+					title: 'Dashboard',
+					icon:"fas fa-clipboard-list"
+				}, 
+				{
+					title: 'Rooms',
+					icon: "fas fa-bed"
+				}, 
+				{
+					title: 'Calendar',
+					icon:"fas fa-calendar-alt"
+				}
+			]
+		}
+	},
 	methods: {
 		logOut() {
 
@@ -41,24 +96,17 @@ export default {
 
 			this.$router.push(`/login/${this.$store.state.user.company.name}`);
 			this.$store.commit('clearAuth');
-		}
+		},
 	},
 	computed: {
-		navbarStyle: () => {
-			return {
-				'border-bottom':'2px solid #7957d5',
-				'height':'8vh',
-				'backgroundColor': 'rgb(238, 238, 238)'
-			}
-		}
 	}
 }
 </script>
 
-<style>
+<style >
 
-.style {
-	background: rgb(238, 238, 238);
+.navbar {
+	background-color: rgb(238, 238, 238) !important;
 }
 
 </style>

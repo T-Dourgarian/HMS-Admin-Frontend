@@ -11,144 +11,148 @@
 
 		
 		<v-row class="ma-0" style="height: 100vh">
-			<v-col cols="3" style="maxHeight: inherit; position: relative;" class="pa-0 darkPurpleBackground">
-				<div >
-					<b-button
-						class="createButton"
-						@click="toggleCreateDialog()"
+			<v-col cols="3" style="maxHeight: inherit; position: relative;" class="pa-0">
+				<v-card
+					class="mx-auto"
+					max-width="500"
+					height="100%"
+					style="borderRadius:0 !important;"
+				>
+					<v-toolbar
+						dark
 					>
-						<v-row align="center" justify="center">
-							<v-col class="px-0">
-								<v-icon style="margin: auto" small color="rgb(238, 238, 238)">fas fa-plus</v-icon>
-							</v-col>
-							<v-col>
-								Create Room
-							</v-col>
-						</v-row>
-					</b-button>
-				</div>
-				<div v-for="room in rooms" :key="room.uuid">
-					<b-button
-						@click="selectRoom(room)"
+						<v-toolbar-title>Rooms</v-toolbar-title>
+
+						<v-spacer></v-spacer>
+
+						<v-btn light
+							@click="toggleCreateDialog()"
+						>
+							Create
+							<v-icon small class="ml-2" >fas fa-plus</v-icon>
+						</v-btn>
+					</v-toolbar>
+
+					<v-list subheader>
+					<!-- <v-subheader>Recent chat</v-subheader> -->
+
+					<v-list-item
+						v-for="room in rooms" 
+						:key="room.uuid"
 						:style="buttonStyle(room)"
+						link
+						@click="selectRoom(room)"
 					>
-						{{ room.name }}
-					</b-button>
-				</div>
-				<div >
+						<v-list-item-content>
+							<v-list-item-title v-text="room.name"></v-list-item-title>
+						</v-list-item-content>
+					</v-list-item>
+					</v-list>
+				</v-card>
+				<!-- <div >
 					<b-button
 						class="amenityButton"
 						@click="openAmenities()"
 					>
 						Manage Amenities
 					</b-button>
-				</div>
+				</div> -->
 			</v-col>
 			<v-col cols="9" >
 
-				<div class="card">
-					<div class="card-content">
-						<div class="content">
-							<v-row>
-								<v-col cols="3">
-									<div class="darkPurpleText">
-										<b>Room Name</b>
-									</div>
-									<div class="subtitle is-6">
-										{{ selectedRoom.name }}
-									</div>
-								</v-col>
-								<v-col cols="3">
-									<div class="darkPurpleText">
-										<b>Subtitle</b>
-									</div>
-									<div class="subtitle is-6">
-										{{ selectedRoom.subtitle }}
-									</div>
-								</v-col>
-								<v-col cols="6">
-									<div>
-										<div class="darkPurpleText" >
-											<b>Description</b>
-										</div>
-										<div class="subtitle is-6">
-											{{ selectedRoom.description }}
-										</div>
-									</div>
-								</v-col>
-							</v-row>
-							<v-row>
-								<v-col >
-									<div>
-										<div class="darkPurpleText" >
-											<b>Add-ons</b>
-										</div>
-										<div 
-											v-for="addOn in selectedRoom.addOns" 
-											:key="addOn.uuid"
-										>
-											<div>{{ addOn.name }} - ${{ addOn.cost }}</div>
-										</div>
-									</div>
-								</v-col>
-								<v-col >
-									<div>
-										<div class="darkPurpleText" >
-											<b>Amenities</b>
-										</div>
-										<div 
-											v-for="amenity in selectedRoom.amenities" 
-											:key="amenity.uuid"
-										>
-											<v-icon small >fas fa-{{ amenity.icon }}</v-icon><span> {{ amenity.name }}</span>
-										</div>
-									</div>
-								</v-col>
-								<v-col cols="6">
-									<b-carousel
-										:pause-hover="false"
-										:autoplay="false"
-										style="height:400px"
-									>
-										<b-carousel-item v-for="(image, i) in selectedRoom.images" :key="i">
-											<section> 
-													<img style="height:400px" :src="'http://localhost:3000' + image.path" alt="">
-												
-											</section>
-										</b-carousel-item>
-									</b-carousel>
-								</v-col>
-							</v-row>
+				<v-row class="mb-2 mx-0 my-0">
+					<v-col cols='1' class="pb-0">
+						<b-button
+							outlined
+							icon-left="fas fa-edit"
+							small
+							@click="openEditDialog(selectedRoom)"
+						>
+							Edit
+						</b-button>
+					</v-col>
+					<v-col cols='1' class="pb-0">
+						<b-button	
+							outlined
+							icon-left="fas fa-trash"
+							small
+							@click="openDeleteDialog(selectedRoom)"
+						>
+							Delete
+						</b-button>
+					</v-col>
+				</v-row>
 
-							<div class="card-footer">
-								<v-row style="margin:0 !important">
-									<v-col cols='2' class="pb-0">
-										<b-button
-											type="is-primary"
-											outlined
-											icon-left="fas fa-edit"
-											small
-											@click="openEditDialog(selectedRoom)"
-										>
-											Edit
-										</b-button>
-									</v-col>
-									<v-col cols='2' class="pb-0">
-										<b-button
-											type="is-primary"
-											outlined
-											icon-left="fas fa-trash"
-											small
-											@click="openDeleteDialog(selectedRoom)"
-										>
-											Delete
-										</b-button>
-									</v-col>
-								</v-row>
+				<v-card>
+					<v-row class="ma-0">
+						<v-col cols="3">
+							<div class="darkPurpleText">
+								<b>Room Name</b>
 							</div>
-						</div>
-					</div>
-				</div>
+							<div class="subtitle is-6">
+								{{ selectedRoom.name }}
+							</div>
+						</v-col>
+						<v-col cols="3">
+							<div class="darkPurpleText">
+								<b>Subtitle</b>
+							</div>
+							<div class="subtitle is-6">
+								{{ selectedRoom.subtitle }}
+							</div>
+						</v-col>
+						<v-col cols="6">
+							<div>
+								<div class="darkPurpleText" >
+									<b>Description</b>
+								</div>
+								<div class="subtitle is-6">
+									{{ selectedRoom.description }}
+								</div>
+							</div>
+						</v-col>
+					</v-row>
+					<v-row class="ma-0">
+						<v-col cols="3">
+							<div class="darkPurpleText" >
+								<b>Add-ons</b>
+							</div>
+							<div 
+								v-for="addOn in selectedRoom.addOns" 
+								:key="addOn.uuid"
+							>
+								<div>{{ addOn.name }} - ${{ addOn.cost }}</div>
+							</div>
+						</v-col>
+						<v-col >
+							<div>
+								<div class="darkPurpleText" >
+									<b>Amenities</b>
+								</div>
+								<div 
+									v-for="amenity in selectedRoom.amenities" 
+									:key="amenity.uuid"
+								>
+									<v-icon small >fas fa-{{ amenity.icon }}</v-icon><span> {{ amenity.name }}</span>
+								</div>
+							</div>
+						</v-col>
+						<v-col cols="6">
+							<b-carousel
+								:pause-hover="false"
+								:autoplay="false"
+								style="height:400px"
+							>
+								<b-carousel-item v-for="(image, i) in selectedRoom.images" :key="i">
+									<section> 
+											<img style="height:400px" :src="'http://localhost:3000' + image.path" alt="">
+										
+									</section>
+								</b-carousel-item>
+							</b-carousel>
+						</v-col>
+					</v-row>
+				</v-card>
 
 				<div>
 
@@ -239,19 +243,18 @@ export default {
 		buttonStyle(room) {
 
 			let buttonStyle = {
-				'width':'100%',
-				'color': '#c8b9f0',
-				'borderRadius':'0',
-				'outline': 'none',
-				'border': 'none',
-				'box-shadow': 'none !important',
-				'background': 'transparent',
+				// 'color': '#c8b9f0 !important',
+				// 'borderRadius':'0',
+				// 'outline': 'none',
+				// 'border': 'none',
+				// 'box-shadow': 'none !important',
+				// 'background': 'transparent',
 				'font-family': 'Roboto, sans-serif'
 			};
 
 			if (this.selectedRoom.uuid == room.uuid) {
-				buttonStyle.color = '#e0d9f3';
-				buttonStyle.background = '#665e79';
+				// buttonStyle.color = '#e0d9f3';
+				buttonStyle.background = '#e4e4e4';
 			}
 
 
@@ -342,7 +345,7 @@ input::-webkit-outer-spin-button,
 }
 
 .createButton:hover {
-	color:rgb(238, 238, 238) !important
+	color:rgb(238, 238, 238) !important;
 }
 
 </style>

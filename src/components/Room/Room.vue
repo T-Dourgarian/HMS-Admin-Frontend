@@ -61,29 +61,61 @@
 			<v-col cols="9" >
 
 				<v-row class="mb-2 mx-0 my-0">
-					<v-col cols='1' class="pb-0">
+					<v-col cols="8" class="py-0">
+
+						<span class="roomName">
+							{{ selectedRoom.name }}
+						</span>
+
+
 						<b-button
 							outlined
 							icon-left="fas fa-edit"
 							small
+							class="ml-3"
 							@click="openEditDialog(selectedRoom)"
 						>
 							Edit
 						</b-button>
-					</v-col>
-					<v-col cols='1' class="pb-0">
+
 						<b-button	
 							outlined
 							icon-left="fas fa-trash"
 							small
 							@click="openDeleteDialog(selectedRoom)"
+							class="ml-3"
 						>
 							Delete
 						</b-button>
+
+					</v-col>
+					<v-col cols='4' class="py-0" style="textAlign:right;">
+
+						<b-button
+							outlined
+							icon-left="fas fa-list"
+							small
+							@click="toggleRoomComponent('details')"
+						>
+							Details
+						</b-button>
+
+						<b-button
+							outlined
+							icon-left="fas fa-file-invoice-dollar"
+							small
+							class="ml-3"
+							@click="toggleRoomComponent('expenses')"
+						>
+							Expenses
+						</b-button>
+
 					</v-col>
 				</v-row>
 
-				<v-card>
+				<v-divider class="mb-2 mt-0"></v-divider>
+
+				<v-card v-if="roomComponent === 'details'">
 					<v-row class="ma-0">
 						<v-col cols="3">
 							<div class="darkPurpleText">
@@ -153,11 +185,9 @@
 						</v-col>
 					</v-row>
 				</v-card>
-
-				<div>
-
-					
-				</div>
+	
+				<Expenses v-if="roomComponent === 'expenses'" :roomTypeUuid="selectedRoom.uuid" />
+			
 			</v-col>
 		</v-row>
 
@@ -205,6 +235,7 @@ import DeleteDialog from './DeleteDialog';
 import CreateDialog from './CreateDialog';
 import EditDialog from './EditDialog'
 import AmenityDialog from './AmenityDialog';
+import Expenses from  './Expenses/Expenses';
 
 
 export default {
@@ -217,12 +248,13 @@ export default {
 			deleteDialog: false,
 			createDialog: false,
 			amenityDialog: false,
+			roomComponent: 'details',
 			selectedRoom: {
 				addOns:[]
-			}
+			},
 		}
 	},
-	components: { DeleteDialog, CreateDialog, AmenityDialog, EditDialog },
+	components: { DeleteDialog, CreateDialog, AmenityDialog, EditDialog, Expenses },
 	methods: {
 		async getRooms() {
 			try {
@@ -259,6 +291,9 @@ export default {
 
 
 			return buttonStyle;
+		},
+		toggleRoomComponent(component) {
+			this.roomComponent = component;
 		},
 		openEditDialog(room) {
 			this.selectedRoom = room;
@@ -346,6 +381,12 @@ input::-webkit-outer-spin-button,
 
 .createButton:hover {
 	color:rgb(238, 238, 238) !important;
+}
+
+
+.roomName {
+	font-size: 25px;
+	font-weight: bold;
 }
 
 </style>
